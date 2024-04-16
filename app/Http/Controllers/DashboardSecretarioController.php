@@ -10,6 +10,7 @@ use App\Models\Cohorte;
 use App\Models\Maestria;
 use App\Models\Docente;
 use App\Models\User;
+use App\Models\Postulante;
 
 class DashboardSecretarioController extends Controller
 {   public function __construct()
