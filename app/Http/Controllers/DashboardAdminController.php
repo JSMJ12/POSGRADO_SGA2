@@ -26,6 +26,18 @@ class DashboardAdminController extends Controller
     
     public function index(Request $request)
     {
+        $maestrias = Maestria::all();
+        
+        $postulantesPorMaestria = [];
+
+        foreach ($maestrias as $maestria) {
+            $cantidadPostulantes = Postulante::where('maestria_id', $maestria->id)->count();
+            $postulantesPorMaestria[] = [
+                'maestria' => $maestria->nombre,
+                'cantidad_postulantes' => $cantidadPostulantes,
+            ];
+        }
+
         $perPage = $request->input('perPage', 10);
         $user = auth()->user();
         $alumnos = Alumno::with('maestria')->get();
@@ -40,7 +52,7 @@ class DashboardAdminController extends Controller
         return view('dashboard.administrador', 
         compact('alumnos', 'matriculadosPorMaestria', 'totalAlumnos', 
         'perPage', 'totalUsuarios', 'totalMaestrias', 'totalSecretarios', 'totalDocentes',
-        'totalPostulantes'));
+        'totalPostulantes', 'postulantesPorMaestria'));
     }
 
 }

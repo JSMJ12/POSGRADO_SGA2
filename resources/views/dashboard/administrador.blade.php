@@ -73,8 +73,15 @@
                 </div>
             </div>
         </div>
-        <!-- Agrega más secciones para otras entidades según sea necesario -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="postulantesPorMaestriaChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
+    
 </div>
 
 @endsection
@@ -140,7 +147,7 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            var label = matriculadosNames[context.dataIndex] + ' (ID ' + matriculadosIDs[context.dataIndex] + '): ' + context.parsed.y + ' alumnos matriculados';
+                            var label = matriculadosNames[context.dataIndex] + ': ' + context.parsed.y + ' alumnos matriculados';
                             return label;
                         }
                     }
@@ -156,4 +163,68 @@
         });
 
     </script>
+<script>
+    // Datos para el gráfico de postulantes por maestría
+    var postulantesPorMaestria = {!! json_encode($postulantesPorMaestria) !!};
+    var maestrias = postulantesPorMaestria.map(item => item.maestria);
+    var postulantes = postulantesPorMaestria.map(item => item.cantidad_postulantes);
+
+    var postulantesData = {
+        labels: maestrias.map((_, index) => index + 1),
+        datasets: [{
+            label: 'Postulantes por maestría',
+            data: postulantes,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                // Añade más colores si necesitas más barras
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    var postulantesOptions = {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        var label = maestrias[context.dataIndex] + ': ' + context.parsed.y + ' postulantes';
+                        return label;
+                    }
+                }
+            }
+        },
+        legend: {
+            display: false 
+        }
+    };
+
+    var postulantesChart = new Chart(document.getElementById('postulantesPorMaestriaChart'), {
+        type: 'bar',
+        data: postulantesData,
+        options: postulantesOptions
+    });
+</script>
+
+    
+    
+    
+    
 @stop
