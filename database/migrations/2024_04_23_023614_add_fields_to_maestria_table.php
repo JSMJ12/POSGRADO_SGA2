@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('maestrias', function (Blueprint $table) {
-            $table->decimal('precio_total')->nullable();
-            $table->date('fecha_inicio')->nullable();
-            $table->date('fecha_fin')->nullable();
+            $table->decimal('inscripcion', 8, 2)->after('nombre')->nullable();
+            $table->decimal('matricula', 8, 2)->after('inscripcion')->nullable();
+            $table->decimal('arancel', 8, 2)->after('matricula')->nullable();
         });
     }
 
@@ -24,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('maestrias', function (Blueprint $table) {
-            $table->dropColumn(['precio_total', 'fecha_inicio', 'fecha_fin']);
+            $table->dropColumn('inscripcion');
+            $table->dropColumn('matricula');
+            $table->dropColumn('arancel');
         });
     }
 };

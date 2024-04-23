@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('maestrias', function (Blueprint $table) {
             $table->string('coordinador')->nullable();
+            $table->foreign('coordinador')->references('dni')->on('docentes');
         });
     }
 
@@ -22,7 +23,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('maestrias', function (Blueprint $table) {
+            // Eliminar la restricción de clave externa primero
+            $table->dropForeign(['coordinador']);
+            // Luego eliminar la columna
             $table->dropColumn('coordinador');
         });
     }
+
 };

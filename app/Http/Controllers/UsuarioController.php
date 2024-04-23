@@ -65,21 +65,9 @@ class UsuarioController extends Controller
     
     public function update(Request $request, User $usuario)
     {
-        $usuario->name = $request->input('usu_nombre');
-        $usuario->apellido = $request->input('usu_apellido');
-        $usuario->sexo = $request->input('usu_sexo');
-        $usuario->email = $request->input('email');
-        $usuario->status = $request->input('usu_estatus', 'ACTIVO');
-
-        // Actualizar la imagen si se proporciona
-        if ($request->hasFile('usu_foto')) {
-            // Eliminar la imagen anterior si existe
-            Storage::delete(str_replace('/storage/', 'public/', $usuario->image));
-
-            // Guardar la nueva imagen
-            $image = $request->file('usu_foto')->store('public/imagenes_usuarios');
-            $usuario->image = str_replace('public/', '/storage/', $image);
-        }
+        
+        $usuario->name = $request->input('name'); 
+        $usuario->apellido = $request->input('apellido');
 
         $usuario->save();
         $usuario->roles()->sync($request->roles);

@@ -50,4 +50,8 @@ class Docente extends Model
     {
         return $this->hasMany(CohorteDocente::class, 'docente_dni');
     }
+    public function maestria()
+    {
+        return $this->belongsToMany(Maestria::class);
+    }
 }

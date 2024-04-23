@@ -11,8 +11,9 @@ class Maestria extends Model
     protected $table = 'maestrias';
 
     protected $fillable = [
-        'nombre', 'status', 'precio_total', 'fecha_inicio', 'fecha_fin', 'coordinador'
+        'nombre', 'status', 'coordinador', 'inscripcion', 'matricula', 'arancel'
     ];
+    
     public function cohorte()
     {
         return $this->hasMany(Cohorte::class);
@@ -32,5 +33,9 @@ class Maestria extends Model
     public function postulantes()
     {
         return $this->belongsToMany(Postulante::class);
+    }
+    public function docentes()
+    {
+        return $this->belongsToMany(Docente::class);
     }
 }

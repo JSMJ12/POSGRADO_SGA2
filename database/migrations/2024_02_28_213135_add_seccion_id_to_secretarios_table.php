@@ -23,7 +23,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('secretarios', function (Blueprint $table) {
-            //
+            // Eliminar la restricción de clave externa primero
+            $table->dropForeign(['seccion_id']);
+            // Luego eliminar la columna
+            $table->dropColumn('seccion_id');
         });
     }
 };
