@@ -29,7 +29,7 @@
                         <tbody>
                             @foreach ($secretarios as $secretario)
                                 <tr>
-                                    <td>{{ $secretario->id }}</td>
+                                    <td>{{ $secretario->dni }}</td>
                                     <td class="text-center">
                                         <img src="{{ asset($secretario->image) }}" alt="Imagen de {{ $secretario->name1 }}" style="max-width: 60px; border-radius: 50%;">
                                     </td>

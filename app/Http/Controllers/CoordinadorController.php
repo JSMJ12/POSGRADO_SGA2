@@ -3,21 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Secretario;
-use App\Models\Alumno;
-use App\Models\Cohorte;
-use App\Models\Maestria;
-use App\Models\Docente;
-use App\Models\User;
-use App\Models\Postulante;
 
-class DashboardSecretarioController extends Controller
-{   public function __construct()
-    {
-        $this->middleware('auth');
-    }
-    
+class CoordinadorController extends Controller
+{
     public function index(Request $request)
     {
         $perPage = $request->input('perPage', 10);

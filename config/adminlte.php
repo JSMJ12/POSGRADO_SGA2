@@ -253,7 +253,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => '',
+    'dashboard_url' => '/inicio',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -300,13 +300,6 @@ return [
             'can' => ['dashboard_docente', 'dashboard_alumno',  'dashboard_secretario',  'dashboard_postulante']
         ],
         [
-            'text' => 'Inicio',
-            'url' => '/inicio',
-            'icon' => 'fas fa-home',
-            'topnav_right' => true,
-            'can' => ['dashboard_docente', 'dashboard_alumno',  'dashboard_secretario', 'dashboard_postulante']
-        ],
-        [
             'text' => 'Buzon',
             'route' => 'messages.index',
             'icon' => 'fas fa-envelope',
@@ -333,6 +326,14 @@ return [
             'route'  => 'dashboard_postulante',
             'icon' => 'far fa-fw fa-file-alt',
             'can' => 'dashboard_postulante'
+        ],
+        ['header' => 'Coordinación', 'can' => 'dashboard_coordinador'],
+        [
+            'text' => 'Coordinación de Mestria',
+            'route'  => 'usuarios.index',
+            'icon' => 'fas fa-fw fa-home',
+            'can' => 'dashboard_coordinador'
+            
         ],
         [
             'text' => 'Usuarios',
