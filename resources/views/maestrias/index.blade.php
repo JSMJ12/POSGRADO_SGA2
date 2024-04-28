@@ -22,187 +22,204 @@
                                         <th>Nombre</th>
                                         <th>Coordinador</th>
                                         <th>Asignaturas</th>
-                                        <th>Precio</th>
-                                        <th>Fecha Inicio - Fin</th>
+                                        <th>Matrícula</th>
+                                        <th>Arancel</th>
+                                        <th>Precio de Inscripción</th>
+
                                         <th></th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($maestrias as $maestria)
-                                    <div class="modal fade" id="editMaestriaModal{{ $maestria->id }}" tabindex="-1" role="dialog" aria-labelledby="editMaestriaModalLabel{{ $maestria->id }}" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="editMaestriaModalLabel{{ $maestria->id }}">Editar Maestria</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form action="{{ route('maestrias.update', $maestria) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="form-group">
-                                                            <label for="maestria-nombre">Nombre:</label>
-                                                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ $maestria->nombre }}" required>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="coordinador">Coordinador:</label>
-                                                            <input type="text" class="form-control" id="coordinador" name="coordinador" value="{{ $maestria->coordinador }}" required>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="precio_total">Precio Total:</label>
-                                                            <input type="number" class="form-control" id="precio_total" name="precio_total" value="{{ $maestria->precio_total }}" required step="0.01" min="0">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="fecha_inicio">Fecha de Inicio:</label>
-                                                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ $maestria->fecha_inicio }}" required>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="fecha_fin">Fecha de Fin:</label>
-                                                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ $maestria->fecha_fin }}" required>
-                                                        </div>
-                                                        <button type="submit" class="btn btn-primary">Actualizar</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal fade" id="addAsignaturaModal{{ $maestria->id }}" tabindex="-1" role="dialog" aria-labelledby="addAsignaturaModalLabel{{ $maestria->id }}" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="addAsignaturaModalLabel{{ $maestria->id }}">Crear Asignatura</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form action="{{ route('asignaturas.store') }}" method="POST" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="form-group">
-                                                            <label for="nombre">Nombre:</label>
-                                                            <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="codigo_asignatura">Código de Asignatura:</label>
-                                                            <input type="text" class="form-control" id="codigo_asignatura" name="codigo_asignatura" required>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="credito">Crédito:</label>
-                                                            <input type="number" class="form-control" id="credito" name="credito" required>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="itinerario">Itinerario:</label>
-                                                            <input type="text" class="form-control" id="itinerario" name="itinerario">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="itinerario">Unidad Curricular:</label>
-                                                            <input type="text" class="form-control" id="unidad_curricular" name="unidad_curricular">
-                                                        </div>
-                                                        <input type="hidden" name="maestria_id" value="{{ $maestria->id }}">
-                                                        <button type="submit" class="btn btn-primary">Agregar</button>
-                                                    </form>
+                                        <div class="modal fade" id="editMaestriaModal{{ $maestria->id }}" tabindex="-1" role="dialog" aria-labelledby="editMaestriaModalLabel{{ $maestria->id }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editMaestriaModalLabel{{ $maestria->id }}">Editar Maestria</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{ route('maestrias.update', $maestria) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="form-group">
+                                                                <label for="maestria-nombre">Nombre:</label>
+                                                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ $maestria->nombre }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="coordinador">Coordinador:</label>
+                                                                <select class="form-control" id="coordinador" name="coordinador" required>
+                                                                    <option value="">Selecciona un coordinador</option>
+                                                                    @foreach($docentes as $docente)
+                                                                        <option value="{{ $docente->dni }}" {{ $maestria->coordinador == $docente->id ? 'selected' : '' }}>{{ $docente->nombre1 }} {{ $docente->nombre2 }} {{ $docente->apellidop }} {{ $docente->apellidom }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="matricula">Precio de Matrícula:</label>
+                                                                <input type="number" step="0.01" class="form-control" id="matricula" name="matricula" value="{{ $maestria->matricula }}" required>
+                                                            </div>
+                                                            
+                                                            <div class="form-group">
+                                                                <label for="arancel">Arancel Anual:</label>
+                                                                <input type="number" step="0.01" class="form-control" id="arancel" name="arancel" value="{{ $maestria->arancel }}" required>
+                                                            </div>
+                                                            
+                                                            <div class="form-group">
+                                                                <label for="inscripcion">Precio de Inscripción:</label>
+                                                                <input type="number" step="0.01" class="form-control" id="inscripcion" name="inscripcion" value="{{ $maestria->inscripcion }}" required>
+                                                            </div>
+                                                            
+                                                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        <div class="modal fade" id="addAsignaturaModal{{ $maestria->id }}" tabindex="-1" role="dialog" aria-labelledby="addAsignaturaModalLabel{{ $maestria->id }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="addAsignaturaModalLabel{{ $maestria->id }}">Crear Asignatura</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{ route('asignaturas.store') }}" method="POST" enctype="multipart/form-data">
+                                                            @csrf
+                                                            <div class="form-group">
+                                                                <label for="nombre">Nombre:</label>
+                                                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="codigo_asignatura">Código de Asignatura:</label>
+                                                                <input type="text" class="form-control" id="codigo_asignatura" name="codigo_asignatura" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="credito">Crédito:</label>
+                                                                <input type="number" class="form-control" id="credito" name="credito" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="itinerario">Itinerario:</label>
+                                                                <input type="text" class="form-control" id="itinerario" name="itinerario">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="itinerario">Unidad Curricular:</label>
+                                                                <input type="text" class="form-control" id="unidad_curricular" name="unidad_curricular">
+                                                            </div>
+                                                            <input type="hidden" name="maestria_id" value="{{ $maestria->id }}">
+                                                            <button type="submit" class="btn btn-primary">Agregar</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     
-                                    <tr>
-                                        <td>{{ $maestria->id }}</td>
-                                        <td>{{ $maestria->nombre }}</td>
-                                        <td>{{ $maestria->coordinador }}</td>
-                                        <td>
-                                            <ul>
-                                                @if ($maestria->asignaturas->count() > 0)
-                                                    @foreach($maestria->asignaturas as $asignatura)
-                                                        <li class="asignatura-item" style="text-decoration: none;" data-toggle="modal" data-target="#editAsignaturaModal{{ $asignatura->id }}" data-asignatura="{{ $asignatura }}">{{ $asignatura->nombre }}</li>
-                                                        <div class="modal fade" id="editAsignaturaModal{{ $asignatura->id }}" tabindex="-1" role="dialog" aria-labelledby="editAsignaturaModalLabel{{ $asignatura->id }}" aria-hidden="true">
-                                                            <div class="modal-dialog" role="document">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="editAsignaturaModalLabel{{ $asignatura->id }}">Editar Asignatura</h5>
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <form method="POST" action="{{ route('asignaturas.update', $asignatura->id) }}" enctype="multipart/form-data">
-                                                                            @csrf
-                                                                            @method('PUT')
-                                                                            <input type="hidden" name="maestria_id" value="{{ $maestria->id }}">
-                                                                            <div class="form-group">
-                                                                                <label for="nombre">Nombre:</label>
-                                                                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ old('nombre', $asignatura->nombre) }}" required>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="codigo_asignatura">Código de asignatura:</label>
-                                                                                <input type="text" class="form-control" id="codigo_asignatura" name="codigo_asignatura" value="{{ old('codigo_asignatura', $asignatura->codigo_asignatura) }}" required>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="credito">Crédito:</label>
-                                                                                <input type="number" class="form-control" id="credito" name="credito" value="{{ old('credito', $asignatura->credito) }}" required>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="itinerario">Itinerario:</label>
-                                                                                <input type="text" class="form-control" id="itinerario" name="itinerario" value="{{ old('itinerario', $asignatura->itinerario) }}">
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label for="itinerario">Unidad Curricular:</label>
-                                                                                <input type="text" class="form-control" id="unidad_curricular" name="unidad_curricular" value="{{ old('unidad_curricular', $asignatura->itinerario) }}">
-                                                                            </div>
-                                                                            <button type="submit" class="btn btn-sm btn-primary float-left">Guardar cambios</button>
-                                                                        </form>
-                                                                        <form action="{{ route('asignaturas.destroy', $asignatura->id) }}" method="POST">
-                                                                            @csrf
-                                                                            @method('DELETE')
-                                                                            <button type="submit" class="btn btn-sm btn-danger float-right" style="margin-left: 5px" onclick="confirmDelete(this.form)">{{ __('Eliminar') }}</button>
-                                                                        </form>
+                                        <tr>
+                                            <td>{{ $maestria->id }}</td>
+                                            <td>{{ $maestria->nombre }}</td>
+                                            <td>
+                                                @foreach($docentes as $docente)
+                                                    @if($docente->dni === $maestria->coordinador)
+                                                        {{ $docente->nombre1 }} {{ $docente->nombre2 }} {{ $docente->apellidop }} {{ $docente->apellidom }}
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                <ul>
+                                                    @if ($maestria->asignaturas->count() > 0)
+                                                        @foreach($maestria->asignaturas as $asignatura)
+                                                            <li class="asignatura-item" style="text-decoration: none;" data-toggle="modal" data-target="#editAsignaturaModal{{ $asignatura->id }}" data-asignatura="{{ $asignatura }}">{{ $asignatura->nombre }}</li>
+                                                            <div class="modal fade" id="editAsignaturaModal{{ $asignatura->id }}" tabindex="-1" role="dialog" aria-labelledby="editAsignaturaModalLabel{{ $asignatura->id }}" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="editAsignaturaModalLabel{{ $asignatura->id }}">Editar Asignatura</h5>
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <form method="POST" action="{{ route('asignaturas.update', $asignatura->id) }}" enctype="multipart/form-data">
+                                                                                @csrf
+                                                                                @method('PUT')
+                                                                                <input type="hidden" name="maestria_id" value="{{ $maestria->id }}">
+                                                                                <div class="form-group">
+                                                                                    <label for="nombre">Nombre:</label>
+                                                                                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ old('nombre', $asignatura->nombre) }}" required>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="codigo_asignatura">Código de asignatura:</label>
+                                                                                    <input type="text" class="form-control" id="codigo_asignatura" name="codigo_asignatura" value="{{ old('codigo_asignatura', $asignatura->codigo_asignatura) }}" required>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="credito">Crédito:</label>
+                                                                                    <input type="number" class="form-control" id="credito" name="credito" value="{{ old('credito', $asignatura->credito) }}" required>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="itinerario">Itinerario:</label>
+                                                                                    <input type="text" class="form-control" id="itinerario" name="itinerario" value="{{ old('itinerario', $asignatura->itinerario) }}">
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="itinerario">Unidad Curricular:</label>
+                                                                                    <input type="text" class="form-control" id="unidad_curricular" name="unidad_curricular" value="{{ old('unidad_curricular', $asignatura->itinerario) }}">
+                                                                                </div>
+                                                                                <button type="submit" class="btn btn-sm btn-primary float-left">Guardar cambios</button>
+                                                                            </form>
+                                                                            <form action="{{ route('asignaturas.destroy', $asignatura->id) }}" method="POST">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit" class="btn btn-sm btn-danger float-right" style="margin-left: 5px" onclick="confirmDelete(this.form)">{{ __('Eliminar') }}</button>
+                                                                            </form>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
-                                                @else
-                                                    <li>No hay asignaturas</li>
-                                                @endif
-                                            </ul>
-                                        </td>
-                                        <td>{{ $maestria->precio_total }}</td>
-                                        <td>{{ $maestria->fecha_inicio }} - {{ $maestria->fecha_fin }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#addAsignaturaModal{{ $maestria->id }}" title="Agregar Asignatura">
-                                                <i class="fas fa-plus-circle"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <div style="display: flex; gap: 10px;">
-                                                <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editMaestriaModal{{ $maestria->id }}" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                        
-                                                @if ($maestria->status == 'ACTIVO')
-                                                    <form action="{{ route('maestrias.disable', $maestria->id) }}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-sm btn-danger" title="Deshabilitar">
-                                                            <i class="fas fa-times-circle"></i>
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <form action="{{ route('maestrias.enable', $maestria->id) }}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-sm btn-success" title="Reactivar">
-                                                            <i class="fas fa-check-circle"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
-                                        </td>
-                                
-                                    </tr>
+                                                        @endforeach
+                                                    @else
+                                                        <li>No hay asignaturas</li>
+                                                    @endif
+                                                </ul>
+                                            </td>
+                                            <td>{{ $maestria->matricula }}</td>
+                                            <td>{{ $maestria->arancel }}</td>
+                                            <td>{{ $maestria->inscripcion }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#addAsignaturaModal{{ $maestria->id }}" title="Agregar Asignatura">
+                                                    <i class="fas fa-plus-circle"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <div style="display: flex; gap: 10px;">
+                                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editMaestriaModal{{ $maestria->id }}" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                            
+                                                    @if ($maestria->status == 'ACTIVO')
+                                                        <form action="{{ route('maestrias.disable', $maestria->id) }}" method="POST" style="display: inline;">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-sm btn-danger" title="Deshabilitar">
+                                                                <i class="fas fa-times-circle"></i>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <form action="{{ route('maestrias.enable', $maestria->id) }}" method="POST" style="display: inline;">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-sm btn-success" title="Reactivar">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                    
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -232,20 +249,28 @@
                         </div>
                         <div class="form-group">
                             <label for="coordinador">Coordinador:</label>
-                            <input type="text" class="form-control" id="coordinador" name="coordinador">
+                            <select class="form-control" id="coordinador" name="coordinador" required>
+                                <option value="">Selecciona un coordinador</option>
+                                @foreach($docentes as $docente)
+                                    <option value="{{ $docente->dni }}" {{ $maestria->coordinador == $docente->id ? 'selected' : '' }}>{{ $docente->nombre1 }} {{ $docente->nombre2 }} {{ $docente->apellidop }} {{ $docente->apellidom }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label for="precio_total">Precio Total:</label>
-                            <input type="number" class="form-control" id="precio_total" name="precio_total" step="0.01" min="0">
+                            <label for="matricula">Precio de Matrícula:</label>
+                            <input type="number" step="0.01" class="form-control" id="matricula" name="matricula" value="{{ $maestria->matricula }}" required>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="fecha_inicio">Fecha de Inicio:</label>
-                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+                            <label for="arancel">Arancel Anual:</label>
+                            <input type="number" step="0.01" class="form-control" id="arancel" name="arancel" value="{{ $maestria->arancel }}" required>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="fecha_fin">Fecha de Fin:</label>
-                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+                            <label for="inscripcion">Precio de Inscripción:</label>
+                            <input type="number" step="0.01" class="form-control" id="inscripcion" name="inscripcion" value="{{ $maestria->inscripcion }}" required>
                         </div>
+                        
                         <button type="submit" class="btn btn-primary">Agregar</button>
                     </form>
                 </div>

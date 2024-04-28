@@ -38,4 +38,8 @@ class Maestria extends Model
     {
         return $this->belongsToMany(Docente::class);
     }
+    public function coordinador()
+    {
+        return $this->belongsTo(Docente::class, 'coordinador');
+    }
 }

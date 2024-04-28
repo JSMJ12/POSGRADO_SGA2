@@ -21,7 +21,7 @@
                 <table class="table table-bordered" id="docentes">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>Cédula / Pasaporte</th>
                             <th>Foto</th>
                             <th>Nombre completo</th>
                             <th>Email</th>

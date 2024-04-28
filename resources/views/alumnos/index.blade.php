@@ -39,10 +39,9 @@
                         <table class="table table-bordered" id='alumnos'>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Cédula / Pasaporte</th>
                                     <th>Foto</th>
                                     <th>Nombre Completo</th>
-                                    <th>DNI</th>
                                     <th>Maestria</th>
                                     <th>Email Institucional</th>
                                     <th>Sexo</th>
@@ -63,7 +62,6 @@
                                         {{ $alumno->apellidop }}<br>
                                         {{ $alumno->apellidom }}
                                     </td>
-                                    <td>{{ $alumno->dni }}</td>
                                     <td>{{ $alumno->maestria->nombre }}</td>
                                     <td>{{ $alumno->email_institucional }}</td>
                                     <td>{{ $alumno->sexo }}</td>

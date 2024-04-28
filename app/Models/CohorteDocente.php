@@ -9,7 +9,8 @@ class CohorteDocente extends Model
 {
     use HasFactory;
     protected $table = 'cohorte_docente';
-    protected $fillable = ['cohort_id', 'docente_dni', 'asignatura_id'];
+    protected $fillable = ['cohort_id', 'docente_dni', 'asignatura_id', 'calificado',
+    'editar',];
     
     public function asignatura()
     {

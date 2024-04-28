@@ -50,7 +50,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="dni">DNI / Pasaporte</label>
+                    <label for="dni">Cédula / Pasaporte</label>
                     <input type="text" class="form-control" id="dni" name="dni" required>
                 </div>
                 <div class="form-group">

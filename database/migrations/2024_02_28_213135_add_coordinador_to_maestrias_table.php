@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::table('maestrias', function (Blueprint $table) {
             $table->string('coordinador')->nullable();
-            $table->foreign('coordinador')->references('dni')->on('docentes');
+            $table->foreign('coordinador')->references('dni')->on('docentes')->onDelete('cascade');
         });
+        
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Maestria;
+use App\Models\Docente;
 
 class MaestriaController extends Controller
 {
@@ -15,9 +16,10 @@ class MaestriaController extends Controller
     {
         $perPage = $request->input('perPage', 10);
 
-        $maestrias = Maestria::with('asignaturas')->get();
+        $maestrias = Maestria::with('asignaturas', )->get();
+        $docentes = Docente::all();
 
-        return view('maestrias.index', compact('maestrias', 'perPage'));
+        return view('maestrias.index', compact('maestrias', 'docentes', 'perPage'));
     }
 
     public function create()
@@ -30,9 +32,9 @@ class MaestriaController extends Controller
         $maestria = new Maestria;
         $maestria->nombre = $request->input('nombre');
         $maestria->coordinador = $request->input('coordinador');
-        $maestria->precio_total = $request->input('precio_total');
-        $maestria->fecha_inicio = $request->input('fecha_inicio');
-        $maestria->fecha_fin = $request->input('fecha_fin');
+        $maestria->matricula = $request->input('matricula');
+        $maestria->arancel = $request->input('arancel');
+        $maestria->inscripcion = $request->input('inscripcion');
         $maestria->save();
 
         return redirect()->route('maestrias.index')->with('success', 'Maestría creada exitosamente.');
@@ -48,9 +50,9 @@ class MaestriaController extends Controller
     {
         $maestria->nombre = $request->input('nombre');
         $maestria->coordinador = $request->input('coordinador');
-        $maestria->precio_total = $request->input('precio_total');
-        $maestria->fecha_inicio = $request->input('fecha_inicio');
-        $maestria->fecha_fin = $request->input('fecha_fin');
+        $maestria->matricula = $request->input('matricula');
+        $maestria->arancel = $request->input('arancel');
+        $maestria->inscripcion = $request->input('inscripcion');
         $maestria->save();
 
         return redirect()->route('maestrias.index')->with('success', 'Maestria actualizada exitosamente.');

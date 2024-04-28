@@ -18,7 +18,7 @@
                     <table class="table table-bordered" id="secretarios">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>Cédula / Pasaporte</th>
                                 <th>Foto</th>
                                 <th>Nombres</th>
                                 <th>Email</th>
