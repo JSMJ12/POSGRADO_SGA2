@@ -88,7 +88,7 @@
                     modalContent += '</ul>';
                 } else {
                     // Si no hay notificaciones, mostrar un mensaje en el modal
-                    var modalContent = '<p>No hay notificaciones disponibles.</p>';
+                    var modalContent = '<p>No hay notificaciones.</p>';
                 }
 
                 // Agregar el contenido al cuerpo del modal

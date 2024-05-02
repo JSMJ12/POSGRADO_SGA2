@@ -27,7 +27,9 @@
                                     <th>Aula</th>
                                     <th>Aforo</th>
                                     <th>Modalidad</th>
-                                    <th>Acciones</th>
+                                    <th>Inicio / Fin</th>
+                                    <th>Editar</th>
+                                    <th>Eliminar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,17 +43,32 @@
                                         <td>{{ $cohorte->aforo }}</td>
                                         <td>{{ $cohorte->modalidad }}</td>
                                         <td>
+                                            @if($cohorte->fecha_inicio)
+                                                {{ \Carbon\Carbon::parse($cohorte->fecha_inicio)->format('d/m/Y') }}
+                                            @else
+                                                ------
+                                            @endif
+                                            /
+                                            @if($cohorte->fecha_fin)
+                                                {{ \Carbon\Carbon::parse($cohorte->fecha_fin)->format('d/m/Y') }}
+                                            @else
+                                                ------
+                                            @endif
+                                        </td>
+                                        <td>
                                             <a href="{{ route('cohortes.edit', $cohorte->id) }}" class="btn btn-outline-primary btn-sm" title="Editar">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('cohortes.destroy', $cohorte) }}" method="POST" style="display: inline-block;">
+                                        </td>
+                                        <td>
+                                            <form id="delete-form-{{ $cohorte->id }}" action="{{ route('cohortes.destroy', $cohorte) }}" method="POST" style="display: inline-block;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-id="{{ $cohorte->id }}" title="Eliminar">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
-                                        </td>
+                                        </td>                                         
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -78,4 +95,33 @@
         }
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const cohorteId = button.getAttribute('data-id');
+                
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Esta acción no se puede deshacer.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('delete-form-' + cohorteId);
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
 @stop

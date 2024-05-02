@@ -12,7 +12,6 @@
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('cohortes.update', $cohorte->id) }}">
-
                         @csrf
                         @method('PUT')
                         <div class="form-group">
@@ -21,7 +20,7 @@
                         </div>
                         <div class="form-group row">
                             <label for="maestria_id" class="col-md-4 col-form-label text-md-right">{{ __('Maestría') }}</label>
-
+                
                             <div class="col-md-6">
                                 <select id="maestria_id" class="form-control @error('maestria_id') is-invalid @enderror" name="maestria_id" required>
                                     <option value="" selected disabled>-- Seleccione una opción --</option>
@@ -29,7 +28,7 @@
                                         <option value="{{ $maestria->id }}" {{ old('maestria_id', $cohorte->maestria_id) == $maestria->id ? 'selected' : '' }}>{{ $maestria->nombre }}</option>
                                     @endforeach
                                 </select>
-
+                
                                 @error('maestria_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -37,10 +36,10 @@
                                 @enderror
                             </div>
                         </div>
-
+                
                         <div class="form-group row">
                             <label for="periodo_academico_id" class="col-md-4 col-form-label text-md-right">{{ __('Periodo Académico') }}</label>
-
+                
                             <div class="col-md-6">
                                 <select id="periodo_academico_id" class="form-control @error('periodo_academico_id') is-invalid @enderror" name="periodo_academico_id" required>
                                     <option value="" selected disabled>-- Seleccione una opción --</option>
@@ -48,7 +47,7 @@
                                         <option value="{{ $periodo_academico->id }}" {{ old('periodo_academico_id', $cohorte->periodo_academico_id) == $periodo_academico->id ? 'selected' : '' }}>{{ $periodo_academico->nombre }}</option>
                                     @endforeach
                                 </select>
-
+                
                                 @error('periodo_academico_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -108,6 +107,31 @@
                                 @enderror
                             </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label for="fecha_inicio" class="col-md-4 col-form-label text-md-right">{{ __('Fecha de Inicio') }}</label>
+                            <div class="col-md-6">
+                                <input id="fecha_inicio" type="date" class="form-control @error('fecha_inicio') is-invalid @enderror" name="fecha_inicio" value="{{ old('fecha_inicio', $cohorte->fecha_inicio) }}" required>
+                                @error('fecha_inicio')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                
+                        <div class="form-group row">
+                            <label for="fecha_fin" class="col-md-4 col-form-label text-md-right">{{ __('Fecha de Fin') }}</label>
+                            <div class="col-md-6">
+                                <input id="fecha_fin" type="date" class="form-control @error('fecha_fin') is-invalid @enderror" name="fecha_fin" value="{{ old('fecha_fin', $cohorte->fecha_fin) }}" required>
+                                @error('fecha_fin')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                
                         
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
@@ -116,8 +140,9 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
+                
             </div>
         </div>
     </div>

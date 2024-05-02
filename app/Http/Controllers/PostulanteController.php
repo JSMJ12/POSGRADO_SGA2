@@ -36,7 +36,7 @@ class PostulanteController extends Controller
 
     public function create()
     {
-        $maestrias = Maestria::all();
+        $maestrias = Maestria::where('status', 'ACTIVO')->get();
         $provincias = ['Azuay', 'Bolívar', 'Cañar', 'Carchi', 'Chimborazo', 'Cotopaxi', 'El Oro', 'Esmeraldas', 'Galápagos', 'Guayas', 'Imbabura', 'Loja', 'Los Ríos', 'Manabí', 'Morona Santiago', 'Napo', 'Orellana', 'Pastaza', 'Pichincha', 'Santa Elena', 'Santo Domingo de los Tsáchilas', 'Sucumbíos', 'Tungurahua', 'Zamora Chinchipe'];
         $tipo_colegio = [
             'FISCAL',

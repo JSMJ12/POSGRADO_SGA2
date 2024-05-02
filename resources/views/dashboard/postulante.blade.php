@@ -30,12 +30,20 @@
                                     <tr>
                                         <td><strong>{{ $postulante->maestria->nombre }}</strong></td>
                                     
-                                        <td><span class="text-muted">Precio:</span> {{ $postulante->maestria->precio_total }}</td>
+                                        <td><span class="text-muted">Precio de Matriculación:</span> ${{ $postulante->maestria->matricula }}</td>
                                     </tr>
-                                    <tr>
-                                        <td><span class="text-muted">Inicio:</span> {{ $postulante->maestria->fecha_inicio }}</td>
-                                        <td><span class="text-muted">Fin:</span> {{ $postulante->maestria->fecha_fin }}</td>
-                                    </tr>
+                                    @if ($postulante->maestria->cohorte)
+                                        @foreach($postulante->maestria->cohorte as $cohorte)
+                                            <tr>
+                                                <td><span class="text-muted">Inicio:</span> {{ $cohorte->fecha_inicio ?? 'N/A' }}</td>
+                                                <td><span class="text-muted">Fin:</span> {{ $cohorte->fecha_fin ?? 'N/A' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="2">No hay cohortes asociados a esta maestría.</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>                        

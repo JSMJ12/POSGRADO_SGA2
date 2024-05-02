@@ -183,7 +183,6 @@ Route::middleware(['can:dashboard_secretario'])->name('cohortes.')->group(functi
     Route::get('cohortes', [CohorteController::class, 'index'])->name('index');
     Route::get('cohortes/create', [CohorteController::class, 'create'])->name('create');
     Route::post('cohortes', [CohorteController::class, 'store'])->name('store');
-    Route::get('cohortes/{cohort}', [CohorteController::class, 'show'])->name('show');
     Route::get('cohortes/{cohort}/edit', [CohorteController::class, 'edit'])->name('edit');
     Route::put('cohortes/{cohort}', [CohorteController::class, 'update'])->name('update');
     Route::delete('cohortes/{cohort}', [CohorteController::class, 'destroy'])->name('destroy');

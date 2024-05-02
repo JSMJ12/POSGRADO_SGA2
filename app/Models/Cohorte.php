@@ -15,6 +15,8 @@ class Cohorte extends Model
         'aula_id',
         'aforo',
         'modalidad',
+        'fecha_inicio',
+        'fecha_fin'
     ];
 
     public function calificacionVerificaciones()

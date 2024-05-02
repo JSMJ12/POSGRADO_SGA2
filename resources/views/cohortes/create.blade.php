@@ -8,7 +8,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Información de Cohorte</div>
+                <div class="card-header text-center bg-success">Información de Cohorte</div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('cohortes.store') }}">
                         @csrf
@@ -39,16 +39,6 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="aula_id">Aula:</label>
-                            <select id="aula_id" class="form-control" name="aula_id" required>
-                                <option value="">--Seleccione--</option>
-                                @foreach($aulas as $aula)
-                                    <option value="{{ $aula->id }}">{{ $aula->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group">
                             <label for="aforo">Aforo:</label>
                             <input id="aforo" type="number" class="form-control" name="aforo" value="{{ old('aforo') }}" required>
                         </div>
@@ -63,6 +53,25 @@
                             </select>
                         </div>
 
+                        <div class="form-group" id="aula_id">
+                            <label for="aula_id">Aula:</label>
+                            <select class="form-control" name="aula_id" required>
+                                <option value="">--Seleccione--</option>
+                                @foreach($aulas as $aula)
+                                    <option value="{{ $aula->id }}">{{ $aula->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_inicio">Fecha de Inicio:</label>
+                            <input id="fecha_inicio" type="date" class="form-control" name="fecha_inicio">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha_fin">Fecha de Fin:</label>
+                            <input id="fecha_fin" type="date" class="form-control" name="fecha_fin">
+                        </div>
+
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary">Crear</button>
                         </div>
@@ -72,4 +81,31 @@
         </div>
     </div>
 </div>
+
+
+@stop
+
+@section('js')
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modalidadSelect = document.getElementById("modalidad");
+        const aulaSelect = document.getElementById("aula_id");
+
+        // Ocultar el campo de selección de aulas al cargar la página
+        aulaSelect.style.display = "none";
+
+        modalidadSelect.addEventListener("change", function() {
+            if (modalidadSelect.value === "virtual") {
+                // Si la modalidad es virtual, ocultar el campo de selección de aulas
+                aulaSelect.style.display = "none";
+                // También, deseleccionar cualquier valor previamente seleccionado
+                aulaSelect.selectedIndex = 0;
+            } else {
+                // Si la modalidad no es virtual, mostrar el campo de selección de aulas
+                aulaSelect.style.display = "block";
+            }
+        });
+    });
+</script>
+
 @stop

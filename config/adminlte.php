@@ -299,13 +299,6 @@ return [
             'id' => 'editarPerfilLink', // Agregamos un ID para identificarlo
             'can' => ['dashboard_docente', 'dashboard_alumno',  'dashboard_secretario',  'dashboard_postulante']
         ],
-        [
-            'text' => 'Buzon',
-            'route' => 'messages.index',
-            'icon' => 'fas fa-envelope',
-            'topnav_right' => true,
-            'can' => ['dashboard_docente', 'dashboard_alumno', 'dashboard_secretario', 'dashboard_postulante'],
-        ],
         
         [
             'type'         => 'darkmode-widget',

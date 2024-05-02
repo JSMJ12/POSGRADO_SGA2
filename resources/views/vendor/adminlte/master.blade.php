@@ -58,6 +58,7 @@
                 font-style: italic;
             }
     </style>
+    
 
     {{-- Livewire Styles --}}
     @if(config('adminlte.livewire'))
