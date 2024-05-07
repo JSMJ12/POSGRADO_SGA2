@@ -82,7 +82,7 @@
                                             @endcan
                                     
                                             <div class="d-flex flex-row">
-                                                @if ($alumno->maestria->cohorte->count() > 0)
+                                                @if ($alumno->maestria->cohorte->count() > 0 && $alumno->matriculas->count() == 0)
                                                     <div class="mr-2">
                                                         @php
                                                             $alumnoDNI = $alumno->dni;

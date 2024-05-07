@@ -59,13 +59,22 @@ class MatriculaController extends Controller
                 DB::beginTransaction();
 
                 foreach ($asignatura_ids as $key => $asignatura_id) {
-                    // Crear la matrícula
-                    Matricula::create([
-                        'alumno_dni' => $alumno_dni,
-                        'asignatura_id' => $asignatura_id,
-                        'cohorte_id' => $cohorte_id,
-                        'docente_dni' => $docente_dnis[$key],
-                    ]);
+                    // Verificar si ya existe una matrícula con los mismos datos
+                    $matriculaExistente = Matricula::where('alumno_dni', $alumno_dni)
+                                                    ->where('asignatura_id', $asignatura_id)
+                                                    ->where('cohorte_id', $cohorte_id)
+                                                    ->where('docente_dni', $docente_dnis[$key])
+                                                    ->first();
+                
+                    // Crear la matrícula solo si no existe una con los mismos datos
+                    if (!$matriculaExistente) {
+                        Matricula::create([
+                            'alumno_dni' => $alumno_dni,
+                            'asignatura_id' => $asignatura_id,
+                            'cohorte_id' => $cohorte_id,
+                            'docente_dni' => $docente_dnis[$key],
+                        ]);
+                    }
                 }
 
                 // Restar 1 al aforo del cohorte
