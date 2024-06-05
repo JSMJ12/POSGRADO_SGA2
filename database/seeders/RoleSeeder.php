@@ -42,13 +42,13 @@ class RoleSeeder extends Seeder
             $permission13 = Permission::create(['name' => 'paralelo.listar'])->syncRoles([$role1, $role3]);
     
             //Docente
-            $permission1 = Permission::create(['name' => 'dashboard_docente'])->syncRoles([$role1,$role2 ]);
+            $permission14 = Permission::create(['name' => 'dashboard_docente'])->syncRoles([$role1,$role2 ]);
     
             //Alumno
-            $permission1 = Permission::create(['name' => 'dashboard_alumno'])->syncRoles([$role1,$role4 ]);
+            $permission15 = Permission::create(['name' => 'dashboard_alumno'])->syncRoles([$role1,$role4 ]);
     
             //Postulante
-            $permission1 = Permission::create(['name' => 'dashboard_postulante'])->syncRoles([$role5]);
+            $permission16 = Permission::create(['name' => 'dashboard_postulante'])->syncRoles([$role5]);
         }
     }
 }

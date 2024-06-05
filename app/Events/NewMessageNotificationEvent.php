@@ -11,12 +11,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use App\Notifications\NewMessageNotification2;
 
-class NewMessageNotificationEvent
+class NewMessageNotificationEvent implements ShouldBroadcast
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $notification;
-
     public $notifiable;
 
     public function __construct(NewMessageNotification2 $notification, $notifiable)
@@ -25,15 +24,25 @@ class NewMessageNotificationEvent
         $this->notifiable = $notifiable;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
+        return [new PrivateChannel('canal_p')];
+    }
+
+    public function broadcastWith()
+    {
         return [
-            new PrivateChannel('canal_p'),
+            'id' => $this->notification->id,
+            'message' => [
+                'content' => $this->notification->message->message,
+                'sender' => [
+                    'name' => $this->notification->message->sender->name,
+                ],
+                'receiver' => [
+                    'name' => $this->notification->message->receiver->name,
+                ],
+            ],
         ];
     }
 }
+

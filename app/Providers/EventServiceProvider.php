@@ -21,14 +21,21 @@ class EventServiceProvider extends ServiceProvider
         NewMessageNotificationEvent::class => [
             NewMessageNotificationListener::class,
         ],
+        PostulanteAceptado::class => [
+            NotificarPostulanteAceptado::class,
+        ],
+        SubirArchivoEvent::class => [
+            SubirArchivoListener::class,
+        ],
     ];
+    
 
     /**
      * Register any events for your application.
      */
-    public function boot(): void
+    public function boot()
     {
-        //
+        parent::boot();
     }
 
     /**

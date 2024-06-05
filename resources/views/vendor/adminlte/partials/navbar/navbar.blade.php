@@ -69,26 +69,37 @@
     $(document).ready(function () {
         $('#notificacionesModalLink').click(function (event) {
             event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
-            
+
             // Realizar una solicitud AJAX para obtener los datos de las notificaciones
             $.get('/notificaciones', function (data) {
                 // Limpiar el contenido del modal antes de actualizarlo
                 $('#notificacionesModal .modal-body').empty();
 
                 // Verificar si hay notificaciones
+                var modalContent;
                 if (data.notificaciones && data.notificaciones.length > 0) {
                     // Construir el contenido del modal con los datos de las notificaciones
-                    var modalContent = '<ul>';
+                    modalContent = '<ul>';
                     data.notificaciones.forEach(function (notificacion) {
-                        var mensaje = notificacion.data.message.message;
-                        var remitente = notificacion.data.message.sender.name;
-                        var receptor = notificacion.data.message.receiver.name;
-                        modalContent += '<li data-message-id="' + notificacion.id + '">De: ' + remitente + '<br>' + ' Mensaje: ' + mensaje + '</li>';
+                        var mensaje;
+                        var remitente;
+                        
+                        if (notificacion.data.type === 'NewMessageNotification') {
+                            mensaje = notificacion.data.message;
+                            remitente = notificacion.data.sender.name;
+                            modalContent += '<li data-message-id="' + notificacion.id + '" data-type="NewMessageNotification">De: ' + remitente + '<br>Mensaje: ' + mensaje + '</li>';
+                        } else if (notificacion.data.type === 'PostulanteAceptadoNotification') {
+                            mensaje = notificacion.data.message;
+                            modalContent += '<li data-message-id="' + notificacion.id + '" data-type="PostulanteAceptadoNotification">Mensaje: ' + mensaje + '</li>';
+                        } else if (notificacion.data.type === 'SubirArchivoNotification') {
+                            mensaje = notificacion.data.message;
+                            modalContent += '<li data-message-id="' + notificacion.id + '" data-type="PostulanteAceptadoNotification">Mensaje: ' + mensaje + '</li>';
+                        }
                     });
                     modalContent += '</ul>';
                 } else {
                     // Si no hay notificaciones, mostrar un mensaje en el modal
-                    var modalContent = '<p>No hay notificaciones.</p>';
+                    modalContent = '<p>No hay notificaciones.</p>';
                 }
 
                 // Agregar el contenido al cuerpo del modal
@@ -97,7 +108,15 @@
                 // Agregar un evento de clic a cada mensaje para redirigir
                 $('#notificacionesModal .modal-body li').click(function() {
                     var messageId = $(this).data('message-id');
-                    window.location.href = '/mensajes/buzon' // Redirigir a la vista del mensaje
+                    var notificationType = $(this).data('type');
+
+                    if (notificationType === 'NewMessageNotification') {
+                        window.location.href = '/mensajes/buzon/'; 
+                    } else if (notificationType === 'PostulanteAceptadoNotification') {
+                        window.location.href = '/inicio'; 
+                    }else if (notificationType === 'SubirArchivoNotification') {
+                        window.location.href = '/inicio'; 
+                    }
                 });
 
                 // Mostrar la cantidad de nuevas notificaciones en el badge del icono de campana
@@ -117,13 +136,122 @@
                 cluster: '{{ env('PUSHER_APP_CLUSTER') }}'
             });
 
-            var channel = pusher.subscribe('private-canal_p');
+            var channel = pusher.subscribe('brief-valley-786');
+
+            // Manejar evento de nuevo mensaje
             channel.bind('App\\Events\\NewMessageNotificationEvent', function(data) {
-                // Manejar el evento recibido y actualizar la interfaz de usuario según sea necesario
                 console.log('Nuevo mensaje recibido:', data);
+
+                var newNotification;
+                if (data.type === 'NewMessageNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="NewMessageNotification">De: ' + data.sender.name + '<br>Mensaje: ' + data.message + '</li>';
+                } else if (data.type === 'PostulanteAceptadoNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="PostulanteAceptadoNotification">Mensaje: ' + data.message + '</li>';
+                }else if (data.type === 'SubirArchivoNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="SubirArchivoNotification">Mensaje: ' + data.message + '</li>';
+                }
+
+                if ($('#notificacionesModal .modal-body ul').length === 0) {
+                    $('#notificacionesModal .modal-body').html('<ul>' + newNotification + '</ul>');
+                } else {
+                    $('#notificacionesModal .modal-body ul').prepend(newNotification);
+                }
+
+                $('#notificacionesModal .modal-body li').first().click(function() {
+                    var messageId = $(this).data('message-id');
+                    var notificationType = $(this).data('type');
+
+                    if (notificationType === 'NewMessageNotification') {
+                        window.location.href = '/mensajes/buzon/'; 
+                    } else if (notificationType === 'PostulanteAceptadoNotification') {
+                        window.location.href = '/inicio'; 
+                    }else if (notificationType === 'SubirArchivoNotification') {
+                        window.location.href = '/inicio'; 
+                    }
+                });
+            });
+
+            // Manejar evento de aceptación de postulante
+            channel.bind('App\\Events\\PostulanteAceptado', function(data) {
+                console.log('Nuevo postulante aceptado:', data);
+
+                var newNotification;
+                if (data.type === 'NewMessageNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="NewMessageNotification">De: ' + data.sender.name + '<br>Mensaje: ' + data.message + '</li>';
+                } else if (data.type === 'PostulanteAceptadoNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="PostulanteAceptadoNotification">Mensaje: ' + data.message + '</li>';
+                }else if (data.type === 'SubirArchivoNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="SubirArchivoNotification">Mensaje: ' + data.message + '</li>';
+                }
+
+                if ($('#notificacionesModal .modal-body ul').length === 0) {
+                    $('#notificacionesModal .modal-body').html('<ul>' + newNotification + '</ul>');
+                } else {
+                    $('#notificacionesModal .modal-body ul').prepend(newNotification);
+                }
+
+                $('#notificacionesModal .modal-body li').first().click(function() {
+                    var messageId = $(this).data('message-id');
+                    var notificationType = $(this).data('type');
+
+                    if (notificationType === 'NewMessageNotification') {
+                        window.location.href = '/mensajes/buzon/'; 
+                    } else if (notificationType === 'PostulanteAceptadoNotification') {
+                        window.location.href = '/inicio'; 
+                    }else if (notificationType === 'SubirArchivoNotification') {
+                        window.location.href = '/inicio'; 
+                    }
+                });
+            });
+            channel.bind('App\\Events\\SubirArchivoEvent', function(data) {
+                console.log('Subir archivo:', data);
+
+                var newNotification;
+                if (data.type === 'NewMessageNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="NewMessageNotification">De: ' + data.sender.name + '<br>Mensaje: ' + data.message + '</li>';
+                } else if (data.type === 'PostulanteAceptadoNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="PostulanteAceptadoNotification">Mensaje: ' + data.message + '</li>';
+                }else if (data.type === 'SubirArchivoNotification') {
+                    newNotification = '<li data-message-id="' + data.id + '" data-type="SubirArchivoNotification">Mensaje: ' + data.message + '</li>';
+                }
+
+                if ($('#notificacionesModal .modal-body ul').length === 0) {
+                    $('#notificacionesModal .modal-body').html('<ul>' + newNotification + '</ul>');
+                } else {
+                    $('#notificacionesModal .modal-body ul').prepend(newNotification);
+                }
+
+                $('#notificacionesModal .modal-body li').first().click(function() {
+                    var messageId = $(this).data('message-id');
+                    var notificationType = $(this).data('type');
+
+                    if (notificationType === 'NewMessageNotification') {
+                        window.location.href = '/mensajes/buzon/'; 
+                    } else if (notificationType === 'PostulanteAceptadoNotification') {
+                        window.location.href = '/inicio'; 
+                    }else if (notificationType === 'SubirArchivoNotification') {
+                        window.location.href = '/inicio'; 
+                    }
+                });
             });
         });
     });
 </script>
+
+<script>
+    $(document).ready(function () {
+        function actualizarContador() {
+            $.get('/cantidad-notificaciones', function (data) {
+                $('#cantidadDeNuevasNotificaciones').text(data.cantidadNotificacionesNuevas);
+            }).fail(function() {
+                $('#cantidadDeNuevasNotificaciones').text('0');
+            });
+        }
+    
+        setInterval(actualizarContador, 100); 
+    });
+</script>
+
+
 
 

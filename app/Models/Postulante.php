@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Postulante extends Model
 {
     use HasFactory;
+    use Notifiable;
     protected $table = 'postulantes';
     protected $primaryKey = 'dni';
     public $incrementing = false;
@@ -45,7 +47,10 @@ class Postulante extends Model
         'pdf_papelvotacion',
         'pdf_titulouniversidad',
         'pdf_conadis',
+        'pdf_hojavida',
         'maestria_id',
+        'status',
+        'pago_matricula',
     ];
     public function maestria()
     {

@@ -36,8 +36,8 @@
                                 <div class="col-md-6">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                                <label for="imagen">Foto:</label>
-                                                <input type="file" id="imageInput" accept="image/*">
+                                            <label for="imagen">Foto:</label>
+                                            <input type="file" id="imageInput" name="imagen" accept="image/*">
                                         </div>
                                     </div>
                                     <br>

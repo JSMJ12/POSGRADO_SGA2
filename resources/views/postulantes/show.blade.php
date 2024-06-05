@@ -6,102 +6,117 @@
     
 @stop
 
-
 @section('content')
     <div class="container">
-
-        <div class="card">
-            <div class="container-fluid bg-success py-3">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h1 class="m-0">{{ $postulante->apellidop }} {{ $postulante->apellidom }}, {{ $postulante->nombre1 }} {{ $postulante->nombre2 }}</h1>
-                    </div>
-                    <div class="col-md-6 text-right">
-                        <img src="{{ asset('storage/' . $postulante->imagen) }}" alt="Imagen de {{ $postulante->nombre }}" style="max-width: 150px; border-radius: 5px;">
-                    </div>
-                </div>
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white text-center">
+                <h1 class="m-0">{{ $postulante->apellidop }} {{ $postulante->apellidom }} {{ $postulante->nombre1 }} {{ $postulante->nombre2 }}</h1>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <dl class="row">
-                            <dt class="col-sm-4">Maestría</dt>
-                            <dd class="col-sm-8">{{ $postulante->maestria->nombre }}</dd>
-
-                            <dt class="col-sm-4">Cédula</dt>
-                            <dd class="col-sm-8">{{ $postulante->dni }}</dd>
-
-                            <dt class="col-sm-4">Correo Electrónico</dt>
-                            <dd class="col-sm-8">{{ $postulante->correo_electronico }}</dd>
-
-                            <dt class="col-sm-4">Celular</dt>
-                            <dd class="col-sm-8">{{ $postulante->celular }}</dd>
-
-                            <dt class="col-sm-4">Título Profesional</dt>
-                            <dd class="col-sm-8">{{ $postulante->titulo_profesional }}</dd>
-
-                            <dt class="col-sm-4">Universidad Título</dt>
-                            <dd class="col-sm-8">{{ $postulante->universidad_titulo }}</dd>
-
-                            <dt class="col-sm-4">Sexo</dt>
-                            <dd class="col-sm-8">{{ $postulante->sexo }}</dd>
-
-                            <dt class="col-sm-4">Fecha de Nacimiento</dt>
-                            <dd class="col-sm-8">{{ $postulante->fecha_nacimiento }}</dd>
-
-                            <dt class="col-sm-4">Nacionalidad</dt>
-                            <dd class="col-sm-8">{{ $postulante->nacionalidad }}</dd>
-
-                            <dt class="col-sm-4">Discapacidad</dt>
-                            <dd class="col-sm-8">{{ $postulante->discapacidad }}</dd>
-
-                            <dt class="col-sm-4">Porcentaje de Discapacidad</dt>
-                            <dd class="col-sm-8">{{ $postulante->porcentaje_discapacidad }}</dd>
-
-                            <dt class="col-sm-4">Código CONADIS</dt>
-                            <dd class="col-sm-8">{{ $postulante->codigo_conadis }}</dd>
-
-                        </dl>
-                    </div>
-                    <div class="col-md-6">
-                        <dl class="row">
-                            <dt class="col-sm-4">Provincia</dt>
-                            <dd class="col-sm-8">{{ $postulante->provincia }}</dd>
-
-                            <dt class="col-sm-4">Etnia</dt>
-                            <dd class="col-sm-8">{{ $postulante->etnia }}</dd>
-
-                            <dt class="col-sm-4">Nacionalidad Indígena</dt>
-                            <dd class="col-sm-8">{{ $postulante->nacionalidad_indigena }}</dd>
-
-                            <dt class="col-sm-4">Cantón</dt>
-                            <dd class="col-sm-8">{{ $postulante->canton }}</dd>
-
-                            <dt class="col-sm-4">Dirección</dt>
-                            <dd class="col-sm-8">{{ $postulante->direccion }}</dd>
-
-                            <dt class="col-sm-4">Tipo de Colegio</dt>
-                            <dd class="col-sm-8">{{ $postulante->tipo_colegio }}</dd>
-
-                            <dt class="col-sm-4">Cantidad de Miembros del Hogar</dt>
-                            <dd class="col-sm-8">{{ $postulante->cantidad_miembros_hogar }}</dd>
-
-                            <dt class="col-sm-4">Ingreso Total del Hogar</dt>
-                            <dd class="col-sm-8">{{ $postulante->ingreso_total_hogar }}</dd>
-
-                            <dt class="col-sm-4">Nivel de Formación del Padre</dt>
-                            <dd class="col-sm-8">{{ $postulante->nivel_formacion_padre }}</dd>
-
-                            <dt class="col-sm-4">Nivel de Formación de la Madre</dt>
-                            <dd class="col-sm-8">{{ $postulante->nivel_formacion_madre }}</dd>
-
-                            <dt class="col-sm-4">Origen de Recursos para Estudios</dt>
-                            <dd class="col-sm-8">{{ $postulante->origen_recursos_estudios }}</dd>
-                        </dl>
-                    </div>
+            <div class="card-body text-center">
+                <div class="mb-4 text-center">
+                    <img src="{{ asset($postulante->imagen) }}" alt="Imagen de {{ $postulante->nombre1 }}" style="width: 200px; height: 200px; border-radius: 5px;">
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>Maestría</th>
+                                <td>{{ $postulante->maestria->nombre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cédula</th>
+                                <td>{{ $postulante->dni }}</td>
+                            </tr>
+                            <tr>
+                                <th>Correo Electrónico</th>
+                                <td>{{ $postulante->correo_electronico }}</td>
+                            </tr>
+                            <tr>
+                                <th>Celular</th>
+                                <td>{{ $postulante->celular }}</td>
+                            </tr>
+                            <tr>
+                                <th>Título Profesional</th>
+                                <td>{{ $postulante->titulo_profesional }}</td>
+                            </tr>
+                            <tr>
+                                <th>Universidad Título</th>
+                                <td>{{ $postulante->universidad_titulo }}</td>
+                            </tr>
+                            <tr>
+                                <th>Sexo</th>
+                                <td>{{ $postulante->sexo }}</td>
+                            </tr>
+                            <tr>
+                                <th>Fecha de Nacimiento</th>
+                                <td>{{ $postulante->fecha_nacimiento }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nacionalidad</th>
+                                <td>{{ $postulante->nacionalidad }}</td>
+                            </tr>
+                            <tr>
+                                <th>Discapacidad</th>
+                                <td>{{ $postulante->discapacidad }}</td>
+                            </tr>
+                            <tr>
+                                <th>Porcentaje de Discapacidad</th>
+                                <td>{{ $postulante->porcentaje_discapacidad }}</td>
+                            </tr>
+                            <tr>
+                                <th>Código CONADIS</th>
+                                <td>{{ $postulante->codigo_conadis }}</td>
+                            </tr>
+                            <tr>
+                                <th>Provincia</th>
+                                <td>{{ $postulante->provincia }}</td>
+                            </tr>
+                            <tr>
+                                <th>Etnia</th>
+                                <td>{{ $postulante->etnia }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nacionalidad Indígena</th>
+                                <td>{{ $postulante->nacionalidad_indigena }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cantón</th>
+                                <td>{{ $postulante->canton }}</td>
+                            </tr>
+                            <tr>
+                                <th>Dirección</th>
+                                <td>{{ $postulante->direccion }}</td>
+                            </tr>
+                            <tr>
+                                <th>Tipo de Colegio</th>
+                                <td>{{ $postulante->tipo_colegio }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cantidad de Miembros del Hogar</th>
+                                <td>{{ $postulante->cantidad_miembros_hogar }}</td>
+                            </tr>
+                            <tr>
+                                <th>Ingreso Total del Hogar</th>
+                                <td>{{ $postulante->ingreso_total_hogar }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nivel de Formación del Padre</th>
+                                <td>{{ $postulante->nivel_formacion_padre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nivel de Formación de la Madre</th>
+                                <td>{{ $postulante->nivel_formacion_madre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Origen de Recursos para Estudios</th>
+                                <td>{{ $postulante->origen_recursos_estudios }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-@stop
+@endsection
+
 

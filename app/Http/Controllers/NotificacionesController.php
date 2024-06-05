@@ -12,19 +12,27 @@ class NotificacionesController extends Controller
         // Obtener las notificaciones del usuario autenticado
         $notificaciones = Auth::user()->unreadNotifications;
 
-        // Obtener la cantidad de notificaciones nuevas
-        $cantidadNotificacionesNuevas = $notificaciones->count();
-        
-
         // Marcar las notificaciones como leídas
         $notificaciones->markAsRead();
 
         // Retornar los datos de las notificaciones como JSON
         return response()->json([
             'notificaciones' => $notificaciones,
+        ]);
+    }
+
+    public function contador()
+    {
+        // Obtener las notificaciones del usuario autenticado
+        $notificaciones = Auth::user()->unreadNotifications;
+
+        // Obtener la cantidad de notificaciones nuevas
+        $cantidadNotificacionesNuevas = $notificaciones->count();
+
+        // Retornar la cantidad de notificaciones nuevas como JSON
+        return response()->json([
             'cantidadNotificacionesNuevas' => $cantidadNotificacionesNuevas
         ]);
-        
     }
 
 

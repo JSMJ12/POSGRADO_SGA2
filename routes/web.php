@@ -50,8 +50,6 @@ Route::get('/', function () {  return redirect()->route('login');});
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 Route::post('/guardar-cambios', [DocenteController::class, 'guardarCambios'])->name('guardarCambios');
 
 Route::get('/dashboard/admin', [DashboardAdminController::class, 'index'])->middleware('can:dashboard_admin')->name('dashboard_admin');
@@ -283,8 +281,10 @@ Route::post('postulacion', [PostulanteController::class, 'store'])->name('postul
 Route::get('postulacion', [PostulanteController::class, 'index'])->name('postulantes.index');
 Route::delete('postulacion/{dni}', [PostulanteController::class, 'destroy'])->where('dni', '.*')->name('postulantes.destroy');
 Route::get('postulacion/{dni}', [PostulanteController::class, 'show'])->where('dni', '.*')->name('postulantes.show');
+Route::post('postulacion/{dni}/aceptar', [PostulanteController::class, 'acep_neg'])->where('dni', '.*')->name('postulantes.aceptar');
 
 Route::resource('notificaciones', NotificacionesController::class)->only(['index', 'destroy']);
+Route::get('/cantidad-notificaciones', [NotificacionesController::class, 'contador']);
 
 
 

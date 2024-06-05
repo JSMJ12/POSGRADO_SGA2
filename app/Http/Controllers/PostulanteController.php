@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\NuevoUsuarioNotification;
 use Illuminate\Validation\Rule;
+use App\Events\PostulanteAceptado;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\PostulanteAceptadoNotification;
 
 class PostulanteController extends Controller
 {
@@ -30,7 +33,6 @@ class PostulanteController extends Controller
             $maestriasIds = $secretario->seccion->maestrias->pluck('id');
             $postulantes = Postulante::whereIn('maestria_postular', $maestriasIds)->get();
         }
-        $postulantes = Postulante::all();
         return view('postulantes.index', compact('postulantes', 'perPage'));
     }
 
@@ -93,15 +95,15 @@ class PostulanteController extends Controller
     }
     public function store(Request $request)
     {
-        Storage::makeDirectory('public/postulantes/imagen');
-        if ($request->hasFile('imagen')) {
-            $imagenPath = $request->file('imagen')->store('postulantes/imagen', 'public');
-        }
         $request->validate([
             'dni' => 'required|unique:postulantes',
             'correo_electronico' => 'required|email|unique:postulantes',
         ]);
-        
+        $imagenPath = null;
+        if ($request->hasFile('imagen')) {
+            $imagePath = $request->file('imagen')->store('public/postulantes/imagen');
+            $imagenPath = asset(str_replace('public/', 'storage/', $imagePath));
+        }
         Postulante::create([
             'dni' => $request->input('dni'),
             'apellidop' => $request->input('apellidop'),
@@ -130,7 +132,7 @@ class PostulanteController extends Controller
             'nivel_formacion_madre' => $request->input('nivel_formacion_madre'),
             'origen_recursos_estudios' => $request->input('origen_recursos_estudios'),
             'maestria_id' => $request->input('maestria_id'),
-            'imagen' => $imagenPath ?? null,
+            'imagen' => $imagenPath,
         ]);
         $usuario = new User;
         $usuario->name = $request->input('nombre1');
@@ -145,25 +147,59 @@ class PostulanteController extends Controller
         $usuario->password = bcrypt($request->input('dni'));
         $usuario->status = $request->input('estatus', 'ACTIVO');
         $usuario->email = $request->input('correo_electronico');
-        $usuario->image = $imagenPath ?? null;
-        $postulanteRole = Role::findById(5);
-        $usuario->assignRole($postulanteRole);
+        $usuario->image = $imagenPath;
+        $usuario->assignRole('Postulante');
         $usuario->save();
         Notification::route('mail', $usuario->email)
         ->notify(new NuevoUsuarioNotification($usuario, $request->input('dni'), $usuario->name));
-        return redirect()->route('dashboard_postulante')->with('success', 'Postulación realizada exitosamente.');
+        Auth::login($usuario);
+        return redirect()->route('inicio')->with('success', 'Postulación realizada exitosamente.');
+
     }
 
     public function show($dni)
     {
         $postulante = Postulante::findOrFail($dni);
+        
         return view('postulantes.show', compact('postulante'));
+
     }
     public function destroy($dni)
     {
         $postulante = Postulante::findOrFail($dni);
+
+        $user = User::where('name', $postulante->nombre1)
+                    ->where('apellido', $postulante->apellidop)
+                    ->where('email', $postulante->correo_electronico)
+                    ->first();
+
+        if ($user) {
+            $user->delete();
+        }
+
         $postulante->delete();
 
-        return redirect()->route('postulantes.index')->with('success', 'Postulante eliminado exitosamente.');
+        return redirect()->route('postulantes.index')->with('success', 'Postulante y usuario eliminado exitosamente.');
     }
+
+    public function acep_neg($dni)
+    {
+        $postulante = Postulante::findOrFail($dni);
+        $postulante->status = true;
+        $postulante->save();
+
+        $usuario = User::where('name', $postulante->nombre1)
+                    ->where('apellido', $postulante->apellidop)
+                    ->where('email', $postulante->correo_electronico)
+                    ->first();
+
+        if ($usuario) {
+            
+            $usuario->notify(new PostulanteAceptadoNotification($postulante));
+            return redirect()->back()->with('message', 'Postulante aceptado y notificación enviada.');
+        } else {
+            return redirect()->back()->with('error', 'Usuario no encontrado.');
+        }
+    }
+
 }
