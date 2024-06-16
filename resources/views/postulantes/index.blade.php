@@ -45,15 +45,15 @@
                                             <tr>
                                                 <td>
                                                     @if($postulante->pdf_cedula)
-                                                        <a href="{{ asset('storage/' . $postulante->pdf_cedula) }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                                            <i class="fas fa-file-pdf"></i> Cédula
+                                                        <a href="{{ asset('storage/' . $postulante->pdf_cedula) }}" target="_blank" class="btn btn-outline-primary btn-sm" title="Ver Cédula">
+                                                            <i class="fas fa-file-pdf"></i>
                                                         </a>
                                                     @endif
                                                 </td>
                                                 <td>
                                                     @if($postulante->pdf_papelvotacion)
-                                                        <a href="{{ asset('storage/' . $postulante->pdf_papelvotacion) }}" target="_blank" class="btn btn-outline-success btn-sm">
-                                                            <i class="fas fa-file-pdf"></i> Papel Votación
+                                                        <a href="{{ asset('storage/' . $postulante->pdf_papelvotacion) }}" target="_blank" class="btn btn-outline-success btn-sm" title="Ver Papel Votación">
+                                                            <i class="fas fa-file-pdf"></i>
                                                         </a>
                                                     @endif
                                                 </td>
@@ -61,15 +61,15 @@
                                             <tr>
                                                 <td>
                                                     @if($postulante->pdf_titulouniversidad)
-                                                        <a href="{{ asset('storage/' . $postulante->pdf_titulouniversidad) }}" target="_blank" class="btn btn-outline-warning btn-sm">
-                                                            <i class="fas fa-file-pdf"></i> Título Universidad
+                                                        <a href="{{ asset('storage/' . $postulante->pdf_titulouniversidad) }}" target="_blank" class="btn btn-outline-warning btn-sm" title="Ver Título Universidad">
+                                                            <i class="fas fa-file-pdf"></i>
                                                         </a>
                                                     @endif
                                                 </td>
                                                 <td>
                                                     @if($postulante->pdf_hojavida)
-                                                        <a href="{{ asset('storage/' . $postulante->pdf_hojavida) }}" target="_blank" class="btn btn-outline-info btn-sm">
-                                                            <i class="fas fa-file-pdf"></i> Hoja de Vida
+                                                        <a href="{{ asset('storage/' . $postulante->pdf_hojavida) }}" target="_blank" class="btn btn-outline-info btn-sm" title="Ver Hoja de Vida">
+                                                            <i class="fas fa-file-pdf"></i>
                                                         </a>
                                                     @endif
                                                 </td>
@@ -77,17 +77,24 @@
                                             <tr>
                                                 <td colspan="2" class="text-center">
                                                     @if($postulante->pdf_conadis)
-                                                        <a href="{{ asset('storage/' . $postulante->pdf_conadis) }}" target="_blank" class="btn btn-outline-info btn-sm">
-                                                            <i class="fas fa-file-pdf"></i> CONADIS
+                                                        <a href="{{ asset('storage/' . $postulante->pdf_conadis) }}" target="_blank" class="btn btn-outline-info btn-sm" title="Ver CONADIS">
+                                                            <i class="fas fa-file-pdf"></i>
                                                         </a>
                                                     @endif
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td>
+                                                    @if($postulante->carta_aceptacion)
+                                                        <a href="{{ asset('storage/' . $postulante->carta_aceptacion) }}" target="_blank" class="btn btn-outline-secondary btn-sm" title="Ver Carta de Aceptación">
+                                                            <i class="fas fa-file-pdf"></i>
+                                                        </a>
+                                                    @endif
+                                                </td>
                                                 <td colspan="2" class="text-center">
                                                     @if($postulante->pago_matricula)
-                                                        <a href="{{ asset('storage/' . $postulante->pago_matricula) }}" target="_blank" class="btn btn-outline-danger btn-sm">
-                                                            <i class="fas fa-file-pdf"></i> Comprobante de Pago
+                                                        <a href="{{ asset('storage/' . $postulante->pago_matricula) }}" target="_blank" class="btn btn-outline-danger btn-sm" title="Ver Comprobante de Pago">
+                                                            <i class="fas fa-file-pdf"></i>
                                                         </a>
                                                     @endif
                                                 </td>
@@ -100,29 +107,37 @@
                                         <ul class="list-group">
                                             <li class="list-group-item text-center">
                                                 <a href="{{ route('postulantes.show', $postulante->dni) }}" class="btn btn-outline-info btn-sm mb-1" title="Ver Detalles">
-                                                    <i class="fas fa-eye"></i> Ver Detalles
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                             </li>
                                             
                                             <li class="list-group-item text-center">
-                                                <!-- Botón para eliminar postulante -->
                                                 <form action="{{ route('postulantes.destroy', $postulante->dni) }}" method="POST" style="display: inline-block;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este postulante?')" title="Eliminar">
-                                                        <i class="fas fa-trash"></i> Eliminar
+                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
                                             </li>
-                                            
+                                
                                             @if (!$postulante->status && $postulante->pdf_cedula && $postulante->pdf_papelvotacion && $postulante->pdf_titulouniversidad && $postulante->pdf_hojavida)
                                                 <li class="list-group-item text-center">
-                                                    <!-- Botón para marcar como Apto -->
                                                     <form action="{{ route('postulantes.aceptar', $postulante->dni) }}" method="POST" style="display: inline-block;">
                                                         @csrf
                                                         @method('POST')
                                                         <button type="submit" class="btn btn-outline-success btn-sm" onclick="return confirm('¿Estás seguro de que deseas marcar a este postulante como Apto?')" title="Marcar como Apto">
-                                                            <i class="fas fa-check"></i> Aceptar
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            @elseif ($postulante->pago_matricula)
+                                                <li class="list-group-item text-center">
+                                                    <form action="{{ route('postulantes.convertir', $postulante->dni) }}" method="POST" style="display: inline-block;">
+                                                        @csrf
+                                                        @method('POST')
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm" onclick="return confirm('¿Estás seguro de que deseas convertir a este postulante en estudiante?')" title="Convertir en Estudiante">
+                                                            <i class="fas fa-user-graduate"></i>
                                                         </button>
                                                     </form>
                                                 </li>
@@ -130,6 +145,7 @@
                                         </ul>
                                     </div>
                                 </td>
+                                
                             </tr>
                         @endforeach
                     </tbody>
@@ -156,4 +172,19 @@
             }
         });
     </script>
+@stop
+@section('css')
+    <style>
+        .btn-outline-lila {
+            color: #6f42c1;
+            border-color: #6f42c1;
+        }
+
+        .btn-outline-lila:hover {
+            color: #fff;
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+        }
+
+    </style>
 @stop

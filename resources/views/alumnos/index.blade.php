@@ -164,8 +164,16 @@
                                     <td>{{ $matricula->asignatura->nombre }}</td>
                                     <td>{{ $matricula->docente ? $matricula->docente->nombre1 : 'Nombre no disponible' }} {{ $matricula->docente ? $matricula->docente->apellidop : 'Apellido Paterno no disponible' }} {{ $matricula->docente ? $matricula->docente->apellido2 : 'Apellido Materno no disponible' }}</td>
                                     <td>{{ $matricula->cohorte->nombre }}</td>
-                                    <td>{{ $matricula->cohorte->aula->nombre }}</td>
-                                    <td>{{ $matricula->cohorte->aula->paralelo->nombre }}</td>
+                                    <td>
+                                        @if ($matricula->cohorte->aula)
+                                            {{ $matricula->cohorte->aula->nombre }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($matricula->cohorte->aula && $matricula->cohorte->aula->paralelo)
+                                            {{ $matricula->cohorte->aula->paralelo->nombre }}
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -46,38 +46,37 @@ class AsignaturaDocenteController extends Controller
         $asignaturas = $request->input('asignaturas');
         $docente_dni = $request->input('docente_dni');
 
-        if(is_array($asignaturas)) {
+        if (is_array($asignaturas)) {
             foreach ($asignaturas as $asignatura) {
-                // Verificar si la asignación ya existe en la base de datos
-                $asignacion_existente = AsignaturaDocente::where('docente_dni', $docente_dni)->where('asignatura_id', $asignatura)->first();
-
-                if (!$asignacion_existente) {
-                    $asignacion = new AsignaturaDocente();
-                    $asignacion->docente_dni = $docente_dni;
-                    $asignacion->asignatura_id = $asignatura;
-                    $asignacion->save();
-                }
+                // Utilizar updateOrCreate para crear o actualizar la asignación
+                AsignaturaDocente::updateOrCreate(
+                    ['docente_dni' => $docente_dni, 'asignatura_id' => $asignatura],
+                    ['docente_dni' => $docente_dni, 'asignatura_id' => $asignatura]
+                );
             }
         } else {
-            // Verificar si la asignación ya existe en la base de datos
-            $asignacion_existente = AsignaturaDocente::where('docente_dni', $docente_dni)->where('asignatura_id', $asignaturas)->first();
-
-            if (!$asignacion_existente) {
-                $asignacion = new AsignaturaDocente();
-                $asignacion->docente_dni = $docente_dni;
-                $asignacion->asignatura_id = $asignaturas;
-                $asignacion->save();
-            }
+            // Utilizar updateOrCreate para crear o actualizar la asignación
+            AsignaturaDocente::updateOrCreate(
+                ['docente_dni' => $docente_dni, 'asignatura_id' => $asignaturas],
+                ['docente_dni' => $docente_dni, 'asignatura_id' => $asignaturas]
+            );
         }
+
         return redirect()->route('docentes.index');
     }
 
-    public function destroy($id)
-    {
-        $asignacion = AsignaturaDocente::findOrFail($id);
-        $asignacion->delete();
 
-        return redirect()->route('asignaturas_docentes.index');
+    public function destroy($docente_dni, $asignatura_id)
+    {
+        $asignaturaDocente = AsignaturaDocente::where('docente_dni', $docente_dni)
+                                              ->where('asignatura_id', $asignatura_id)
+                                              ->first();
+
+        if ($asignaturaDocente) {
+            $asignaturaDocente->delete();
+        }
+
+        return redirect()->back()->with('success', 'Asignatura eliminada correctamente');
     }
 
 }

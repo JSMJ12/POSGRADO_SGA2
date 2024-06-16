@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Postulante;
 use App\Models\Maestria;
 use App\Models\Secretario;
+use App\Models\Alumno;
+use Illuminate\Support\Facades\File;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Notification;
@@ -201,5 +203,86 @@ class PostulanteController extends Controller
             return redirect()->back()->with('error', 'Usuario no encontrado.');
         }
     }
+
+
+    public function convertirEnEstudiante($dni)
+    {
+        $postulante = Postulante::find($dni);
+
+        $rutaDirectorio = 'public/alumnos/pdf';
+        if (!Storage::exists($rutaDirectorio)) {
+            Storage::makeDirectory($rutaDirectorio);
+        }
+       
+        $pdf_cedula_path = $postulante->pdf_cedula;
+        $pdf_papelvotacion_path = $postulante->pdf_papelvotacion;
+        $pdf_titulouniversidad_path = $postulante->pdf_titulouniversidad;
+        $pdf_conadis_path = $postulante->pdf_conadis;
+        $pdf_hojavida_path = $postulante->pdf_hojavida;
+        $carta_aceptacion_path = $postulante->carta_aceptacion;
+        $pago_matricula_path = $postulante->pago_matricula;
+        if ($postulante && $postulante->status) {
+            $email_institucional = strtolower($postulante->apellidop) . strtolower($postulante->nombre1) .'-'. substr($postulante->dni, -4) . '@unesum.edu.ec';
+
+            $estudiante = Alumno::create([
+                'dni' => $postulante->dni,
+                'nombre1' => $postulante->nombre1,
+                'nombre2' => $postulante->nombre2,
+                'apellidop' => $postulante->apellidop,
+                'apellidom' => $postulante->apellidom,
+                'email_personal' => $postulante->correo_electronico,
+                'email_institucional' => $email_institucional,
+                'estado_civil' => $postulante->estado_civil,
+                'fecha_nacimiento' => $postulante->fecha_nacimiento,
+                'provincia' => $postulante->provincia,
+                'canton' => $postulante->canton,
+                'barrio' => $postulante->barrio,
+                'direccion' => $postulante->direccion,
+                'nacionalidad' => $postulante->nacionalidad,
+                'etnia' => $postulante->etnia,
+                'carnet_discapacidad' => $postulante->carnet_discapacidad,
+                'tipo_discapacidad' => $postulante->tipo_discapacidad,
+                'porcentaje_discapacidad' => $postulante->porcentaje_discapacidad,
+                'contra' => bcrypt($postulante->dni), 
+                'image' => $postulante->image,
+                'maestria_id' => $postulante->maestria_id,
+                'celular' => $postulante->celular,
+                'titulo_profesional' => $postulante->titulo_profesional,
+                'universidad_titulo' => $postulante->universidad_titulo,
+                'tipo_colegio' => $postulante->tipo_colegio,
+                'cantidad_miembros_hogar' => $postulante->cantidad_miembros_hogar,
+                'ingreso_total_hogar' => $postulante->ingreso_total_hogar,
+                'nivel_formacion_padre' => $postulante->nivel_formacion_padre,
+                'nivel_formacion_madre' => $postulante->nivel_formacion_madre,
+                'origen_recursos_estudios' => $postulante->origen_recursos_estudios,
+                'pdf_cedula' => $pdf_cedula_path,
+                'pdf_papelvotacion' => $pdf_papelvotacion_path,
+                'pdf_titulouniversidad' => $pdf_titulouniversidad_path,
+                'pdf_conadis' => $pdf_conadis_path,
+                'pdf_hojavida' => $pdf_hojavida_path,
+                'carta_aceptacion' => $carta_aceptacion_path,
+                'pago_matricula' => $pago_matricula_path,
+            ]);
+            $user = User::where('name', $postulante->nombre1)
+                        ->where('apellido', $postulante->apellidop)
+                        ->where('email', $postulante->correo_electronico)
+                        ->first();
+
+            if ($user) {
+                $user->assignRole('Alumno');
+                $user->removeRole('Postulante');
+                $user->email = $email_institucional;
+                $user->save();
+            }
+            Notification::route('mail', $usuario->email)
+            ->notify(new NuevoUsuarioNotification($usuario, $request->input('dni'), $usuario->name));
+            $postulante->delete();
+
+            return redirect()->back()->with('success', 'El postulante ha sido convertido en estudiante.');
+        }
+
+        return redirect()->back()->with('error', 'El postulante no puede ser convertido en estudiante.');
+    }
+
 
 }

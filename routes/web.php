@@ -57,12 +57,13 @@ Route::get('/dashboard/admin', [DashboardAdminController::class, 'index'])->midd
 Route::get('/dashboard/docente', [DashboardDocenteController::class, 'index'])->middleware('can:dashboard_docente')->name('dashboard_docente');
 
 Route::get('/dashboard/secretario', [DashboardSecretarioController::class, 'index'])->middleware('can:dashboard_secretario')->name('dashboard_secretario');
+Route::post('/postulantes/{dni}/convertir', [PostulanteController::class, 'convertirEnEstudiante'])->middleware('can:dashboard_secretario')->name('postulantes.convertir');
 
 Route::get('/dashboard/alumno', [DashboardAlumnoController::class, 'index'])->middleware('can:dashboard_alumno')->name('dashboard_alumno');
 
 Route::get('/dashboard/postulante', [DashboardPostulanteController::class, 'index'])->middleware('can:dashboard_postulante')->name('dashboard_postulante');
 Route::post('postulante/store', [DashboardPostulanteController::class, 'store'])->middleware('can:dashboard_postulante')->name('dashboard_postulante.store');
-
+Route::get('postulantes/{dni}/carta-aceptacion', [DashboardPostulanteController::class, 'carta_aceptacionPdf'])->middleware('can:dashboard_postulante')->name('postulantes.carta_aceptacion');
 // Crud usuarios
 Route::resource('usuarios', UsuarioController::class)->middleware('can:dashboard_admin')->names([
     'index' => 'usuarios.index',
@@ -130,7 +131,7 @@ Route::middleware(['can:dashboard_admin'])->name('maestrias.')->group(function (
     Route::put('maestrias/{maestria}/disable', [MaestriaController::class, 'disable'])->name('disable');
     Route::put('maestrias/{maestria}/enable', [MaestriaController::class, 'enable'])->name('enable');
 });
-
+Route::delete('/docentes/{docente_dni}/asignaturas/{asignatura_id}', [AsignaturaDocenteController::class, 'destroy'])->name('eliminar_asignatura');
 Route::get('/asignaturas_docentes/create/{docente_id}', [AsignaturaDocenteController::class, 'create'])
     ->where('docente_id', '.*')
     ->name('asignaturas_docentes.create1');
@@ -255,7 +256,7 @@ Route::middleware(['can:dashboard_admin'])->name('notas.')->group(function () {
     Route::delete('notas/{id_alumno}', [NotaController::class, 'destroy'])->where('id_alumno', '.*')->name('destroy');
 });
 
-Route::get('/generar-pdf/{docenteId}/{asignaturaId}/{cohorteId}/{aulaId}/{paraleloId}', [NotasAsignaturaController::class, 'show'])
+Route::get('/generar-pdf/{docenteId}/{asignaturaId}/{cohorteId}/{aulaId?}/{paraleloId?}', [NotasAsignaturaController::class, 'show'])
     ->where('docenteId', '.*')
     ->middleware(['can:dashboard_docente'])
     ->name('pdf.notas.asignatura');
@@ -268,7 +269,8 @@ Route::get('/enviar-correo', [CorreoController::class, 'formulario'])->name('for
 Route::post('/enviar-correo', [CorreoController::class, 'enviarCorreo'])->name('enviar-correo');
 Route::get('/cancelar-envio', [CorreoController::class, 'cancelarEnvio'])->name('cancelar-envio');
 
-Route::get('/exportar-excel/{docenteId}/{asignaturaId}/{cohorteId}/{aulaId}/{paraleloId}', [DashboardDocenteController::class, 'exportarExcel'])->name('exportar.excel');
+Route::get('/exportar-excel/{docenteId}/{asignaturaId}/{cohorteId}/{aulaId?}/{paraleloId?}', [DashboardDocenteController::class, 'exportarExcel'])
+    ->name('exportar.excel');
 
 Route::get('/inicio', [InicioController::class, 'redireccionarDashboard'])->name('inicio');
 

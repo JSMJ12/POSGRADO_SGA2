@@ -6,9 +6,11 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Console\\Commands\\DispararRecordatorioSubirArchivos' => $baseDir . '/app/Console/Commands/DispararRecordatorioSubirArchivos.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Events\\NewMessageNotificationEvent' => $baseDir . '/app/Events/NewMessageNotificationEvent.php',
     'App\\Events\\PostulanteAceptado' => $baseDir . '/app/Events/PostulanteAceptado.php',
+    'App\\Events\\SubirArchivoEvent' => $baseDir . '/app/Events/SubirArchivoEvent.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Exports\\AlumnosExport' => $baseDir . '/app/Exports/AlumnosExport.php',
     'App\\Http\\Controllers\\AlumnoController' => $baseDir . '/app/Http/Controllers/AlumnoController.php',
@@ -66,6 +68,7 @@ return array(
     'App\\Jobs\\NotificarPostulanteAceptadoJob' => $baseDir . '/app/Jobs/NotificarPostulanteAceptadoJob.php',
     'App\\Listeners\\NewMessageNotificationListener' => $baseDir . '/app/Listeners/NewMessageNotificationListener.php',
     'App\\Listeners\\NotificarPostulanteAceptado' => $baseDir . '/app/Listeners/NotificarPostulanteAceptado.php',
+    'App\\Listeners\\SubirArchivoListener' => $baseDir . '/app/Listeners/SubirArchivoListener.php',
     'App\\Models\\Alumno' => $baseDir . '/app/Models/Alumno.php',
     'App\\Models\\Asignatura' => $baseDir . '/app/Models/Asignatura.php',
     'App\\Models\\AsignaturaDocente' => $baseDir . '/app/Models/AsignaturaDocente.php',
@@ -90,6 +93,7 @@ return array(
     'App\\Notifications\\Postulacion2' => $baseDir . '/app/Notifications/Postulacion2.php',
     'App\\Notifications\\PostulanteAceptadoNotification' => $baseDir . '/app/Notifications/PostulanteAceptadoNotification.php',
     'App\\Notifications\\ResetPassword' => $baseDir . '/app/Notifications/ResetPassword.php',
+    'App\\Notifications\\SubirArchivoNotification' => $baseDir . '/app/Notifications/SubirArchivoNotification.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\AuthServiceProvider' => $baseDir . '/app/Providers/AuthServiceProvider.php',
     'App\\Providers\\BroadcastServiceProvider' => $baseDir . '/app/Providers/BroadcastServiceProvider.php',

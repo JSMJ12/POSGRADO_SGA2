@@ -29,6 +29,8 @@ class Postulante extends Model
         'fecha_nacimiento',
         'nacionalidad',
         'discapacidad',
+        'tipo_discapacidad',
+
         'porcentaje_discapacidad',
         'codigo_conadis',
         'provincia',
@@ -50,6 +52,7 @@ class Postulante extends Model
         'pdf_hojavida',
         'maestria_id',
         'status',
+        'carta_aceptacion',
         'pago_matricula',
     ];
     public function maestria()

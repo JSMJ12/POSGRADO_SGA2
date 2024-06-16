@@ -18,45 +18,48 @@ class DashboardAlumnoController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('perPage', 10);
-        $alumnoNombre = auth()->user()->name;
-        $alumnoApellido = auth()->user()->apellido;
-        $alumnoEmail = auth()->user()->email;
-        $alumno = Alumno::where('nombre1', $alumnoNombre)
-                ->where('apellidop', $alumnoApellido)
-                ->where('email_institucional', $alumnoEmail)
-                ->first();
+        $user = auth()->user();
 
-        // Obtener las asignaturas matriculadas del alumno
-        $matriculas = $alumno->matriculas;
-        $asignaturas = [];
+        // Buscar el alumno basado en nombre1, apellidop, y email_institucional del usuario autenticado
+        $alumno = Alumno::where('nombre1', $user->name)
+            ->where('apellidop', $user->apellido)
+            ->where('email_institucional', $user->email)
+            ->firstOrFail();
 
-        foreach ($matriculas as $matricula) {
-            $asignaturas[] = $matricula->asignatura;
-        }
-        // Obtener las notas del alumno en cada asignatura
-        $notas = [];
-        foreach ($asignaturas as $asignatura) {
-            $asignatura->load('docentes');
-            $nota = Nota::where('alumno_dni', $alumno->dni)
-                        ->where('asignatura_id', $asignatura->id)
-                        ->first();
+        // Eager load de relaciones necesarias
+        $alumno->load([
+            'matriculas.asignatura.cohortes.aula.paralelo',
+            'matriculas.asignatura.notas' => function ($query) use ($alumno) {
+                $query->where('alumno_dni', $alumno->dni);
+            }
+        ]);
 
-            $docente = Docente::find($nota->docente_dni);
-            $cohorte = $asignatura->cohortes()->with('aula')->first();
-            $notas[$asignatura->nombre] = [
-                'actividades_aprendizaje' => $nota->nota_actividades,
-                'practicas_aplicacion' => $nota->nota_practicas,
-                'aprendizaje_autonomo' => $nota->nota_autonomo,
-                'examen_final' => $nota->examen_final,
-                'recuperacion' => $nota->recuperacion,
-                'total' => $nota->total,
-                'aula' => $cohorte->aula->nombre,
-                'paralelo' => $cohorte->aula->paralelo->nombre,
-                'docente' => $docente->nombre1 . ' ' . $docente->nombre2 . ' ' . $docente->apellidop . ' ' . $docente->apellidom,
-                'docente_image' => $docente->image
+        // Preparar la lista de asignaturas y notas
+        $asignaturas = $alumno->matriculas->map->asignatura;
+        $notas = $asignaturas->mapWithKeys(function ($asignatura) use ($alumno) {
+            // Obtener nota o establecer valores predeterminados
+            $nota = $asignatura->notas->first();
+            $cohorte = $asignatura->cohortes->first();
+            $docente = $cohorte ? $cohorte->docentes->first() : null;
+
+            return [
+                $asignatura->nombre => [
+                    'actividades_aprendizaje' => $nota->nota_actividades ?? 'N/A',
+                    'practicas_aplicacion' => $nota->nota_practicas ?? 'N/A',
+                    'aprendizaje_autonomo' => $nota->nota_autonomo ?? 'N/A',
+                    'examen_final' => $nota->examen_final ?? 'N/A',
+                    'recuperacion' => $nota->recuperacion ?? 'N/A',
+                    'total' => $nota->total ?? 'N/A',
+                    'aula' => $cohorte ? $cohorte->aula->nombre : 'N/A',
+                    'paralelo' => $cohorte ? $cohorte->aula->paralelo->nombre : 'N/A',
+                    'docente' => $docente ? $docente->nombre1 . ' ' . $docente->nombre2 . ' ' . $docente->apellidop . ' ' . $docente->apellidom : 'N/A',
+                    'docente_image' => $docente ? $docente->image : 'default_image_path.jpg',
+                ]
             ];
-        }
+        });
 
-        return view('dashboard.alumno', compact('asignaturas', 'notas', 'perPage'));
+        return view('dashboard.alumno', compact('asignaturas', 'notas', 'perPage', 'alumno'));
     }
+
+
 }

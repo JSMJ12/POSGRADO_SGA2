@@ -47,41 +47,42 @@ class DashboardDocenteController extends Controller
         
                     // Obtener el valor de la propiedad 'editar' o establecerlo en false si no hay instancia
                     $editar = $calificacionVerificacion ? $calificacionVerificacion->editar : null;
-                    
+                    $aulaId = $cohorte->aula ? $cohorte->aula->id : null;
+                    $paraleloId = $cohorte->aula && $cohorte->aula->paralelo ? $cohorte->aula->paralelo->id : null;
                     $calificarUrlParams = [
                         $docente->dni,
                         $asignatura->id,
                         $cohorte->id,
-                        $cohorte->aula->id,
-                        $cohorte->aula->paralelo->id,
+                        $aulaId,
+                        $paraleloId,
                         $notasExisten[$cohorte->id] 
                     ];
                     $calificarUrlParamsArray[] = $calificarUrlParams;
         
                     return [
                         'nombre' => $cohorte->nombre,
-                        'aula' => $cohorte->aula->nombre,
-                        'paralelo' => $cohorte->aula->paralelo->nombre,
+                        'aula' => $cohorte->aula ? $cohorte->aula->nombre : 'Sin aula',
+                        'paralelo' => $cohorte->aula && $cohorte->aula->paralelo ? $cohorte->aula->paralelo->nombre : 'Sin paralelo',
                         'fechaLimite' => $fechaLimite,
                         'docenteId' => $docente->dni,
                         'asignaturaId' => $asignatura->id,
                         'cohorteId' => $cohorte->id,
-                        'pdfNotasUrl' => $notasExisten[$cohorte->id] ? route('pdf.notas.asignatura', [
+                        'pdfNotasUrl' => $notasExisten[$cohorte->id] && $cohorte->aula && $cohorte->aula->paralelo ? route('pdf.notas.asignatura', [
                             'docenteId' => $docente->dni,
                             'asignaturaId' => $asignatura->id,
                             'cohorteId' => $cohorte->id,
                             'aulaId' => $cohorte->aula->id,
                             'paraleloId' => $cohorte->aula->paralelo->id,
                         ]) : null,
-                        'excelUrl' => route('exportar.excel', [
+                        'excelUrl' => $cohorte->aula && $cohorte->aula->paralelo ? route('exportar.excel', [
                             'docenteId' => $docente->dni,
                             'asignaturaId' => $asignatura->id,
                             'cohorteId' => $cohorte->id,
                             'aulaId' => $cohorte->aula->id,
                             'paraleloId' => $cohorte->aula->paralelo->id,
-                        ]),
-                        'calificarUrl' => $editar ? route('calificaciones.create1', end($calificarUrlParamsArray)) : null,
-                        'alumnos' => $cohorte->matriculas->unique(['alumno_dni'])->map(function ($matricula) use ($docente, $asignatura, $cohorte){
+                        ]) : null,
+                        'calificarUrl' => $editar && $cohorte->aula && $cohorte->aula->paralelo ? route('calificaciones.create1', end($calificarUrlParamsArray)) : null,
+                        'alumnos' => $cohorte->matriculas->unique('alumno_dni')->map(function ($matricula) use ($docente, $asignatura, $cohorte) {
                             return [
                                 'imagen' => asset($matricula->alumno->image),
                                 'nombreCompleto' => $matricula->alumno->apellidop . ' ' . $matricula->alumno->apellidom . ' ' . $matricula->alumno->nombre1 . ' ' . $matricula->alumno->nombre2,
@@ -89,6 +90,7 @@ class DashboardDocenteController extends Controller
                             ];
                         }),
                     ];
+                    
                 })->values(), 
             ];
         });

@@ -12,7 +12,13 @@
             </div>
         @else
             @foreach($cohortes as $cohorte)
-                <h4>{{ $cohorte->maestria->nombre }} {{ $cohorte->nombre }} - Paralelo: {{ $cohorte->aula->paralelo->nombre }} - Periodo Academico: {{ $cohorte->periodo_academico->nombre }}  {{ $cohorte->periodo_academico->status }}</h4>
+            <h4>{{ $cohorte->maestria->nombre }} {{ $cohorte->nombre }}
+                @if($cohorte->aula && $cohorte->aula->paralelo)
+                    - Paralelo: {{ $cohorte->aula->paralelo->nombre }}
+                @else
+                    - Periodo Academico: {{ $cohorte->periodo_academico->nombre }} {{ $cohorte->periodo_academico->status }}
+                @endif
+            </h4>
                 @if ($cohorte->asignaturas->isEmpty())
                     <div class="alert alert-warning">
                         No se han asignado docentes ni asignaturas para este cohorte.

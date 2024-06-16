@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Postulante;
 use App\Models\User;
 use App\Models\Maestria;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Notification;
@@ -79,10 +80,16 @@ class DashboardPostulanteController extends Controller
         if ($request->hasFile('pago_matricula')) {
             $pdfPagoMatriculaPath = $request->file('pago_matricula')->store('postulantes/pdf', 'public');
         }
+        if ($request->hasFile('carta_aceptacion')) {
+            $pdfCartaAceptacionPath = $request->file('carta_aceptacion')->store('postulantes/pdf', 'public');
+        }
 
         $updateData = [];
         if (isset($pdfCedulaPath)) {
             $updateData['pdf_cedula'] = $pdfCedulaPath;
+        }
+        if (isset($pdfCartaAceptacionPath)) {
+            $updateData['carta_aceptacion'] = $pdfCartaAceptacionPath;
         }
         if (isset($pdfPapelVotacionPath)) {
             $updateData['pdf_papelvotacion'] = $pdfPapelVotacionPath;
@@ -108,5 +115,18 @@ class DashboardPostulanteController extends Controller
 
         return redirect()->route('inicio')->with('success', 'Postulación realizada exitosamente.');
     }
+
+    public function carta_aceptacionPdf(Request $request, $dni)
+    {
+        $postulante = Postulante::find($dni);
+
+        $filename = 'Carta_de_Aceptacion_' . $postulante->nombre1 . '_' . $postulante->apellidop . '_' . $postulante->dni . '.pdf';
+
+        return PDF::loadView('postulantes.carta_aceptacion', compact('postulante'))
+                    ->setPaper('A4', 'portrait')
+                    ->stream($filename);
+    }
+
+
 
 }

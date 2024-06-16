@@ -8,6 +8,10 @@ use App\Models\Asignatura;
 use App\Models\Docente;
 use App\Models\Cohorte;
 use App\Models\CohorteDocente;
+use App\Models\Nota;
+use App\Models\CalificacionVerificacion;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CohorteDocenteController extends Controller
 {
@@ -15,75 +19,166 @@ class CohorteDocenteController extends Controller
     {
         $this->middleware('auth');
     }
+
     public function create($docente_dni, $asignatura_id = null)
     {
-        $docente = Docente::where('dni', $docente_dni)->firstOrFail();
-        $asignaturas = $docente->asignaturas;
-        
-        if ($asignatura_id) {
-            $asignatura = Asignatura::findOrFail($asignatura_id);
-            $maestria = Maestria::findOrFail($asignatura->maestria_id);
-            $cohortes = $maestria->cohorte;
-
-            $maestriaCohortes = [
-                [
-                    'asignatura' => $asignatura,
-                    'maestria' => $maestria,
-                    'cohortes' => $cohortes
-                ]
-            ];
-        } else {
+        try {
+            // Buscar al docente por su DNI
+            $docente = Docente::where('dni', $docente_dni)->firstOrFail();
+            
+            // Inicializar el arreglo $maestriaCohortes
             $maestriaCohortes = [];
 
-            foreach ($asignaturas as $asignatura) {
-                $maestria = Maestria::findOrFail($asignatura->maestria_id);
-                $cohortes = $maestria->cohorte;
-                $maestriaCohortes[] = [
-                    'asignatura' => $asignatura,
-                    'maestria' => $maestria,
-                    'cohortes' => $cohortes
-                ];
-            }
-        }
+            // Obtener todos los cohortes asignados al docente
+            $cohortesAsignados = $docente->cohortes->pluck('id')->toArray();
 
-        return view('cohortes_docentes.create', compact('docente', 'asignaturas', 'maestriaCohortes', 'asignatura_id'));
+            if ($asignatura_id) {
+                // Si se proporciona $asignatura_id, obtener cohortes para esa asignatura específica
+                $asignatura = Asignatura::findOrFail($asignatura_id);
+                $maestria = $asignatura->maestria;
+                $cohortes = $maestria->cohorte()->whereDate('fecha_fin', '>', Carbon::now())->get();
+
+                if ($cohortes->isNotEmpty()) {
+                    $maestriaCohortes[] = [
+                        'maestria' => $maestria,
+                        'asignaturas' => [$asignatura],
+                        'cohortes' => $cohortes
+                    ];
+                }
+            } else {
+                // Agrupar asignaturas por maestría y filtrar cohortes válidas
+                $asignaturas = $docente->asignaturas->groupBy('maestria_id');
+
+                foreach ($asignaturas as $maestriaId => $asignaturasPorMaestria) {
+                    $maestria = Maestria::find($maestriaId);
+                    $cohortes = $maestria->cohorte()->whereDate('fecha_fin', '>', Carbon::now())->get();
+
+                    if ($cohortes->isNotEmpty()) {
+                        $maestriaCohortes[] = [
+                            'maestria' => $maestria,
+                            'asignaturas' => $asignaturasPorMaestria,
+                            'cohortes' => $cohortes
+                        ];
+                    }
+                }
+            }
+
+            // Retornar la vista con los datos necesarios
+            return view('cohortes_docentes.create', compact('docente', 'maestriaCohortes', 'asignatura_id', 'cohortesAsignados'));
+
+        } catch (ModelNotFoundException $e) {
+            // Manejar el caso donde no se encuentre el docente o la asignatura
+            abort(404); // O cualquier manejo de error que consideres adecuado
+        }
     }
+
     public function store(Request $request)
     {
-        $cohorteIds = $request->input('cohorte_id', []);
-        $docenteDni = $request->input('docente_dni');      
-        $asignaturaId = $request->input('asignatura_id');
+        $docenteDni = $request->input('docente_dni');
+        $asignaturaCohortePairs = $request->input('asignatura_cohorte', []);
 
-        foreach ($cohorteIds as $cohorteId) {
-            CohorteDocente::updateOrCreate(
-                [
-                    'cohort_id' => $cohorteId,
-                    'docente_dni' => $docenteDni,
-                    'asignatura_id' => $asignaturaId,
-                ],
-            );
+        try {
+            // Obtener el docente por su DNI
+            $docente = Docente::where('dni', $docenteDni)->firstOrFail();
+
+            // Obtener todos los cohortes asignados actualmente al docente
+            $cohortesActuales = $docente->cohortes->pluck('id')->toArray();
+
+            // Convertir el input de cohortes en un array plano de IDs de cohortes seleccionados
+            $cohortesSeleccionados = [];
+            foreach ($asignaturaCohortePairs as $asignaturaId => $cohorteIds) {
+                $cohortesSeleccionados = array_merge($cohortesSeleccionados, $cohorteIds);
+            }
+
+            // Encontrar cohortes para desasignar (están en actuales pero no en seleccionados)
+            $cohortesADesasignar = array_diff($cohortesActuales, $cohortesSeleccionados);
+
+            // Remover los cohortes que ya no están seleccionados
+            if (!empty($cohortesADesasignar)) {
+                foreach ($cohortesADesasignar as $cohorteId) {
+                    $asignaturasIds = CohorteDocente::where('cohorte_id', $cohorteId)
+                                                    ->where('docente_dni', $docenteDni)
+                                                    ->pluck('asignatura_id');
+
+                    foreach ($asignaturasIds as $asignaturaId) {
+                        // Eliminar el registro de CohorteDocente
+                        CohorteDocente::where([
+                            'cohorte_id' => $cohorteId,
+                            'docente_dni' => $docenteDni,
+                            'asignatura_id' => $asignaturaId,
+                        ])->delete();
+
+                        // Verificar si existen notas
+                        $notasExistentes = Nota::where([
+                            'cohorte_id' => $cohorteId,
+                            'docente_dni' => $docenteDni,
+                            'asignatura_id' => $asignaturaId,
+                        ])->exists();
+
+                        // Actualizar el registro de CalificacionVerificacion
+                        if ($notasExistentes) {
+                            CalificacionVerificacion::where([
+                                'cohorte_id' => $cohorteId,
+                                'docente_dni' => $docenteDni,
+                                'asignatura_id' => $asignaturaId,
+                            ])->update([
+                                'calificado' => true,
+                                'editar' => false,
+                            ]);
+                        } else {
+                            CalificacionVerificacion::where([
+                                'cohorte_id' => $cohorteId,
+                                'docente_dni' => $docenteDni,
+                                'asignatura_id' => $asignaturaId,
+                            ])->delete();
+                        }
+                    }
+                }
+            }
+
+            // Asignar los nuevos cohortes seleccionados al docente
+            foreach ($asignaturaCohortePairs as $asignaturaId => $cohorteIds) {
+                foreach ($cohorteIds as $cohorteId) {
+                    if (!empty($cohorteId)) {
+                        CohorteDocente::updateOrCreate(
+                            [
+                                'cohort_id' => $cohorteId,
+                                'docente_dni' => $docenteDni,
+                                'asignatura_id' => $asignaturaId,
+                            ]
+                        );
+
+                        // Verificar si existen notas
+                        $notasExistentes = Nota::where([
+                            'cohorte_id' => $cohorteId,
+                            'docente_dni' => $docenteDni,
+                            'asignatura_id' => $asignaturaId,
+                        ])->exists();
+
+                        // Actualizar o crear el registro de CalificacionVerificacion
+                        CalificacionVerificacion::updateOrCreate(
+                            [
+                                'cohorte_id' => $cohorteId,
+                                'docente_dni' => $docenteDni,
+                                'asignatura_id' => $asignaturaId,
+                            ],
+                            [
+                                'calificado' => $notasExistentes,
+                                'editar' => !$notasExistentes,
+                            ]
+                        );
+                    }
+                }
+            }
+
+            // Redirigir con éxito
+            return redirect()->route('docentes.index')->with('success', 'Cohortes actualizados con éxito.');
+        } catch (ModelNotFoundException $e) {
+            // Manejar el caso donde no se encuentre el docente
+            return redirect()->route('docentes.index')->with('error', 'Docente no encontrado.');
+        } catch (\Exception $e) {
+            // Manejar cualquier otro error
+            return redirect()->route('docentes.index')->with('error', 'Ocurrió un error al actualizar los cohortes.');
         }
-        foreach ($cohorteIds as $cohorteId) {
-            // Verificar si ya hay notas para esta combinación
-            $notasExistentes = Nota::where([
-                'cohorte_id' => $cohorteId,
-                'docente_dni' => $docenteDni,
-                'asignatura_id' => $asignaturaId,
-            ])->exists();
-        
-            // Crear o actualizar la calificación de verificación
-            CalificacionVerificacion::updateOrCreate(
-                [
-                    'cohorte_id' => $cohorteId,
-                    'docente_dni' => $docenteDni,
-                    'asignatura_id' => $asignaturaId,
-                    'calificado' => $notaExistente,
-                    'editar' => !$notaExistente,
-                ],
-
-            );
-        }
-
-        return redirect()->route('docentes.index');
     }
 }

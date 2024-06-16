@@ -31,7 +31,25 @@ class Alumno extends Model
         'porcentaje_discapacidad',
         'contra',
         'image',
-        'maestria_id'
+        'maestria_id',
+        'celular',
+        'titulo_profesional',
+        'universidad_titulo',
+        'nacionalidad_indigena',
+        'tipo_colegio',
+        'cantidad_miembros_hogar',
+        'ingreso_total_hogar',
+        'nivel_formacion_padre',
+        'nivel_formacion_madre',
+        'origen_recursos_estudios',
+        'pdf_cedula',
+        'pdf_papelvotacion',
+        'pdf_titulouniversidad',
+        'pdf_conadis',
+        'pdf_hojavida',
+        'carta_aceptacion',
+        'pago_matricula',
+
     ];
     public function notas()
     {

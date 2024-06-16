@@ -110,7 +110,7 @@ class CohorteController extends Controller
             'nombre' => 'required|string',
             'maestria_id' => 'required|exists:maestrias,id',
             'periodo_academico_id' => 'required|exists:periodos_academicos,id',
-            'aula_id' => 'nullable',
+            'aula_id' => 'nullable|exists:aulas,id',
             'aforo' => 'required|integer',
             'modalidad' => 'required|in:presencial,hibrida,virtual',
             'fecha_inicio' => 'nullable|date',

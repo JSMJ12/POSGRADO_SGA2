@@ -654,9 +654,11 @@ class ComposerStaticInit9c491b8531eec05ba41a11d9276a5749
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\DispararRecordatorioSubirArchivos' => __DIR__ . '/../..' . '/app/Console/Commands/DispararRecordatorioSubirArchivos.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Events\\NewMessageNotificationEvent' => __DIR__ . '/../..' . '/app/Events/NewMessageNotificationEvent.php',
         'App\\Events\\PostulanteAceptado' => __DIR__ . '/../..' . '/app/Events/PostulanteAceptado.php',
+        'App\\Events\\SubirArchivoEvent' => __DIR__ . '/../..' . '/app/Events/SubirArchivoEvent.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Exports\\AlumnosExport' => __DIR__ . '/../..' . '/app/Exports/AlumnosExport.php',
         'App\\Http\\Controllers\\AlumnoController' => __DIR__ . '/../..' . '/app/Http/Controllers/AlumnoController.php',
@@ -714,6 +716,7 @@ class ComposerStaticInit9c491b8531eec05ba41a11d9276a5749
         'App\\Jobs\\NotificarPostulanteAceptadoJob' => __DIR__ . '/../..' . '/app/Jobs/NotificarPostulanteAceptadoJob.php',
         'App\\Listeners\\NewMessageNotificationListener' => __DIR__ . '/../..' . '/app/Listeners/NewMessageNotificationListener.php',
         'App\\Listeners\\NotificarPostulanteAceptado' => __DIR__ . '/../..' . '/app/Listeners/NotificarPostulanteAceptado.php',
+        'App\\Listeners\\SubirArchivoListener' => __DIR__ . '/../..' . '/app/Listeners/SubirArchivoListener.php',
         'App\\Models\\Alumno' => __DIR__ . '/../..' . '/app/Models/Alumno.php',
         'App\\Models\\Asignatura' => __DIR__ . '/../..' . '/app/Models/Asignatura.php',
         'App\\Models\\AsignaturaDocente' => __DIR__ . '/../..' . '/app/Models/AsignaturaDocente.php',
@@ -738,6 +741,7 @@ class ComposerStaticInit9c491b8531eec05ba41a11d9276a5749
         'App\\Notifications\\Postulacion2' => __DIR__ . '/../..' . '/app/Notifications/Postulacion2.php',
         'App\\Notifications\\PostulanteAceptadoNotification' => __DIR__ . '/../..' . '/app/Notifications/PostulanteAceptadoNotification.php',
         'App\\Notifications\\ResetPassword' => __DIR__ . '/../..' . '/app/Notifications/ResetPassword.php',
+        'App\\Notifications\\SubirArchivoNotification' => __DIR__ . '/../..' . '/app/Notifications/SubirArchivoNotification.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',

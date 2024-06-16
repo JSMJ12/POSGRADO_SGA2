@@ -111,6 +111,16 @@
                                     <input type="file" name="pdf_conadis" class="form-control-file" accept=".pdf">
                                 </div>
                             @endif
+                            
+                            @if (is_null($postulante->carta_aceptacion))
+                                <a href="{{ route('postulantes.carta_aceptacion', $postulante->dni) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-download"></i> Descargar el formato de la  Carta de Aceptación
+                                </a>
+                                <div class="form-group">
+                                    <label for="carta_aceptacion">Carta de Aceptación:</label>
+                                    <input type="file" name="carta_aceptacion" class="form-control-file" accept=".pdf">
+                                </div>
+                            @endif
 
                             @if ($postulante->status == 1 && $postulante->pago_matricula == null)
                                 <p style="font-weight: bold; font-size: 1.2em; color: #333;">
@@ -133,7 +143,7 @@
                                     <input type="file" id="comprobante_pago" name="pago_matricula" class="form-control-file" accept=".pdf">
                                 </div>
                             @endif
-                            @if(is_null($postulante->pdf_cedula) || is_null($postulante->pdf_papelvotacion) || is_null($postulante->pdf_titulouniversidad) || is_null($postulante->pdf_hojavida) || ($postulante->discapacidad == 'Sí' && is_null($postulante->pdf_conadis)))
+                            @if(is_null($postulante->pago_matricula) || is_null($postulante->carta_aceptacion) || is_null($postulante->pdf_cedula) || is_null($postulante->pdf_papelvotacion) || is_null($postulante->pdf_titulouniversidad) || is_null($postulante->pdf_hojavida) || ($postulante->discapacidad == 'Sí' && is_null($postulante->pdf_conadis)))
                                 <div class="form-group text-center">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
                                 </div>

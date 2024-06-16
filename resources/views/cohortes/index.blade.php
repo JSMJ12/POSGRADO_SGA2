@@ -39,7 +39,13 @@
                                         <td>{{ $cohorte->nombre }}</td>
                                         <td>{{ $cohorte->maestria->nombre }}</td>
                                         <td>{{ $cohorte->periodo_academico->nombre }}</td>
-                                        <td>{{ $cohorte->aula->nombre }}</td>
+                                        <td>
+                                            @if ($cohorte->aula)
+                                                {{ $cohorte->aula->nombre }}
+                                            @else
+                                                <span class="text-muted">No requerido</span>
+                                            @endif
+                                        </td>
                                         <td>{{ $cohorte->aforo }}</td>
                                         <td>{{ $cohorte->modalidad }}</td>
                                         <td>

@@ -55,7 +55,7 @@
 
                         <div class="form-group" id="aula_id">
                             <label for="aula_id">Aula:</label>
-                            <select class="form-control" name="aula_id" required>
+                            <select class="form-control" name="aula_id">
                                 <option value="">--Seleccione--</option>
                                 @foreach($aulas as $aula)
                                     <option value="{{ $aula->id }}">{{ $aula->nombre }}</option>

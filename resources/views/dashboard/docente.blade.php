@@ -1,7 +1,9 @@
 @extends('adminlte::page')
+
 @section('title', 'Dashboard Docente')
+
 @section('content_header')
-    <h1>Dashboard</h1>
+    <h1>Dashboard Docente</h1>
 @stop
 
 @section('content')
@@ -11,85 +13,81 @@
                 <div class="card-header toggle-body" data-toggle="cohorte_{{ $loop->index }}">
                     <strong>{{ $asignatura['nombre'] }}</strong>
                 </div>
-                
                 @foreach ($asignatura['cohortes'] as $cohorte)
                     <div class="card-header toggle-body" data-toggle="cohorte_{{ $loop->parent->index }}_{{ $loop->index }}">
-                        <strong>{{ $cohorte['nombre'] }}  Aula:</strong> {{ $cohorte['aula'] }} <strong> Paralelo: </strong> {{ $cohorte['paralelo'] }} <strong> Fecha límite: </strong> {{$cohorte['fechaLimite']}}
+                        <strong>{{ $cohorte['nombre'] }}</strong>
+                        <span>Aula: {{ $cohorte['aula'] }} | Paralelo: {{ $cohorte['paralelo'] }} | Fecha límite: {{ $cohorte['fechaLimite'] }}</span>
                         <div class="float-right" id="botones">
                             <a href="{{ $cohorte['excelUrl'] }}" class="btn btn-success btn-sm">
                                 <i class="fas fa-file-excel"></i> Lista de Alumnos
                             </a>
                             @php
-                                
                                 $editar = false;
                                 $calificacionVerificacion = DB::table('calificacion_verificacion')
                                     ->where('docente_dni', $cohorte['docenteId'])
                                     ->where('asignatura_id', $cohorte['asignaturaId'])
                                     ->where('cohorte_id', $cohorte['cohorteId'])
                                     ->first();
-
                                 if ($calificacionVerificacion) {
                                     $editar = $calificacionVerificacion->editar;
                                 }
                             @endphp
                             @if ($editar || ($cohorte['fechaLimite'] >= now() && auth()->user()->can('calificar') && $cohorte['pdfNotasUrl'] == null))
-                                <a href="{{ $cohorte['calificarUrl'] }}" class="btn btn-primary btn-sm" id="btnCalificar">Calificar</a>
+                                <a href="{{ $cohorte['calificarUrl'] }}" class="btn btn-primary btn-sm">Calificar</a>
                             @endif
-                        
-                            @if ($notasExisten && $cohorte['pdfNotasUrl'] !== null)
-                                <a href="{{ $cohorte['pdfNotasUrl'] }}" class="btn btn-danger btn-sm" id="btnPdfNotas" target="_blank">
+                            @if ($cohorte['pdfNotasUrl'] !== null)
+                                <a href="{{ $cohorte['pdfNotasUrl'] }}" class="btn btn-danger btn-sm" target="_blank">
                                     <i class="fas fa-file-pdf"></i> PDF de Notas
                                 </a>
                             @endif
                         </div>
                     </div>
                     <div class="card-body" id="cohorte_{{ $loop->parent->index }}_{{ $loop->index }}" style="display: none;">
-                        <table class="table" id="docente">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>Nombre Completo</th>
-                                    <th>Calificar / Ver Notas</th>
+                                    <th>Imagen</th>
+                                    <th>Nota Actividades</th>
+                                    <th>Nota Prácticas</th>
+                                    <th>Nota Autónomo</th>
+                                    <th>Examen Final</th>
+                                    <th>Recuperación</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (!empty($cohorte['alumnos']))
-                                    @foreach ($cohorte['alumnos'] as $alumno)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="{{ asset($alumno['imagen']) }}" alt="Imagen del alumno" class="img-thumbnail rounded-circle mr-3" style="width: 80px;">
-                                                    <div>
-                                                        <p class="mb-0 font-weight-bold">{{ $alumno['nombreCompleto'] }}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                @if ( $cohorte['pdfNotasUrl'] !== null)
-                                                    <a href="{{ $alumno['verNotasUrl'] }}">Ver Notas</a>
-                                                @else
-                                                    <a href="{{ $cohorte['calificarUrl'] }}" class="btn btn-primary btn-sm" id="btnCalificar">Calificar</a>
-                                                @endif
-                                            
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
+                                @forelse ($cohorte['alumnos'] as $alumno)
                                     <tr>
-                                        <td colspan="3">No hay alumnos en este cohorte.</td>
+                                        <td>{{ $alumno['nombreCompleto'] }}</td>
+                                        <td>
+                                            <img src="{{ asset($alumno['imagen']) }}" alt="Imagen del alumno" class="img-thumbnail rounded-circle" style="width: 80px;">
+                                        </td>
+                                        <td>{{ $alumno['notas']['nota_actividades'] ?? 'N/A' }}</td>
+                                        <td>{{ $alumno['notas']['nota_practicas'] ?? 'N/A' }}</td>
+                                        <td>{{ $alumno['notas']['nota_autonomo'] ?? 'N/A' }}</td>
+                                        <td>{{ $alumno['notas']['examen_final'] ?? 'N/A' }}</td>
+                                        <td>{{ $alumno['notas']['recuperacion'] ?? 'N/A' }}</td>
+                                        <td>{{ $alumno['notas']['total'] ?? 'N/A' }}</td>
+                                        <td>
+                                            @if ($cohorte['pdfNotasUrl'] !== null)
+                                                <a href="{{ $alumno['verNotasUrl'] }}" class="btn btn-info btn-sm">Ver Notas</a>
+                                            @else
+                                                <a href="{{ $cohorte['calificarUrl'] }}" class="btn btn-primary btn-sm">Calificar</a>
+                                            @endif
+                                        </td>
                                     </tr>
-                                @endif
+                                @empty
+                                    <tr>
+                                        <td colspan="9">No hay alumnos en este cohorte.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 @endforeach
             </div>
-            @if ($notasExisten)
-                <script>
-                    $(document).ready(function(){
-                        $('#btnPdfNotas_{{ $loop->index }}').show();
-                    });
-                </script>
-            @endif
         @endforeach
     </div>
 @stop
@@ -104,3 +102,4 @@
         });
     </script>
 @stop
+
