@@ -320,6 +320,7 @@ return [
             'icon' => 'far fa-fw fa-file-alt',
             'can' => 'dashboard_postulante'
         ],
+
         ['header' => 'Coordinación', 'can' => 'dashboard_coordinador'],
         [
             'text' => 'Coordinación de Mestria',
@@ -339,6 +340,24 @@ return [
             'route'  => 'secretarios.index',
             'icon' => 'fas fa-fw fa-user-tie',
             'can' => 'dashboard_admin'
+        ],
+        [
+            'text' => 'Pagos',
+            'route'  => 'pagos.index',
+            'icon' => 'fas fa-fw fa-dollar-sign',
+            'can' => 'secretarios.crear', 
+        ],
+        [
+            'text' => 'Pagos',
+            'route' => 'pagos.pago',
+            'icon' => 'fas fa-fw fa-dollar-sign',
+            'can' => 'alumno_descuento', 
+        ],
+        [
+            'text' => 'Descuento',
+            'route' => 'pago.descuento.form',
+            'icon' => 'fas fa-fw fa-dollar-sign',
+            'can' => 'alumno_descuento', 
         ],
         [
             'text' => 'Docentes',

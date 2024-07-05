@@ -41,7 +41,12 @@
                 <div class="card-body">
                     <ul class="list-group">
                         @foreach($asignaturas as $asignatura)
-                            <li class="list-group-item">{{ $asignatura->nombre }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ $asignatura->nombre }}</span>
+                                @if($asignatura->silabo)
+                                    <a href="{{ asset('storage/'.$asignatura->silabo) }}" target="_blank" class="btn btn-success btn-sm">Ver Sílabo</a>
+                                @endif
+                            </li>
                         @endforeach
                     </ul>
                 </div>

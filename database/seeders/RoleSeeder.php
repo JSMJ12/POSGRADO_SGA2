@@ -14,41 +14,53 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        {
-            $role1 = Role::create(['name' => 'Administrador']);
-            $role2 = Role::create(['name' => 'Docente']);
-            $role3 = Role::create(['name' => 'Secretario']);
-            $role4 = Role::create(['name' => 'Alumno']);
-            $role5 = Role::create(['name' => 'Postulante']);
-            //Administrador
-            $permission1 = Permission::create(['name' => 'dashboard_admin'])->syncRoles([$role1]);
-            $permission2 = Permission::create(['name' => 'admin.usuarios.disable'])->syncRoles([$role1]);
-            $permission3 = Permission::create(['name' => 'admin.usuarios.enable'])->syncRoles([$role1]);
-            $permissionA = Permission::create(['name' => 'admin.usuarios.crear'])->syncRoles([$role1]);
-            $permissionb = Permission::create(['name' => 'admin.usuarios.editar'])->syncRoles([$role1]);
-            $permissionc = Permission::create(['name' => 'admin.usuarios.listar'])->syncRoles([$role1]);
-    
-            //Secretario
-            $permission1 = Permission::create(['name' => 'dashboard_secretario'])->syncRoles([$role1,$role3 ]);
-            $permissionA1 = Permission::create(['name' => 'secretarios.crear'])->syncRoles([$role1, $role3]);
-            $permissionb1 = Permission::create(['name' => 'secretarios.editar'])->syncRoles([$role1, $role3]);
-            $permissionc2 = Permission::create(['name' => 'secretarios.listar'])->syncRoles([$role1, $role3]);
-            $permission7 = Permission::create(['name' => 'docentes.crear'])->syncRoles([$role1, $role3]);
-            $permission8 = Permission::create(['name' => 'docentes.editar'])->syncRoles([$role1, $role3]);
-            $permission9 = Permission::create(['name' => 'docentes.listar'])->syncRoles([$role1, $role3]);
-            $permission10 = Permission::create(['name' => 'paralelo.crear'])->syncRoles([$role1, $role3]);
-            $permission11 = Permission::create(['name' => 'paralelo.eliminar'])->syncRoles([$role1, $role3]);
-            $permission12 = Permission::create(['name' => 'paralelo.editar'])->syncRoles([$role1, $role3]);
-            $permission13 = Permission::create(['name' => 'paralelo.listar'])->syncRoles([$role1, $role3]);
-    
-            //Docente
-            $permission14 = Permission::create(['name' => 'dashboard_docente'])->syncRoles([$role1,$role2 ]);
-    
-            //Alumno
-            $permission15 = Permission::create(['name' => 'dashboard_alumno'])->syncRoles([$role1,$role4 ]);
-    
-            //Postulante
-            $permission16 = Permission::create(['name' => 'dashboard_postulante'])->syncRoles([$role5]);
+        // Definir roles con IDs específicos
+        $roles = [
+            ['id' => 1, 'name' => 'Administrador'],
+            ['id' => 2, 'name' => 'Docente'],
+            ['id' => 3, 'name' => 'Secretario'],
+            ['id' => 4, 'name' => 'Alumno'],
+            ['id' => 5, 'name' => 'Postulante'],
+        ];
+
+        // Crear o actualizar roles con IDs fijos
+        foreach ($roles as $roleData) {
+            Role::updateOrCreate(['id' => $roleData['id']], $roleData);
         }
+
+        // Obtener los roles recién creados o actualizados
+        $role1 = Role::find(1);
+        $role2 = Role::find(2);
+        $role3 = Role::find(3);
+        $role4 = Role::find(4);
+        $role5 = Role::find(5);
+
+        // Crear permisos y sincronizar con roles
+        Permission::create(['name' => 'dashboard_admin'])->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.usuarios.disable'])->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.usuarios.enable'])->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.usuarios.crear'])->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.usuarios.editar'])->syncRoles([$role1]);
+        Permission::create(['name' => 'admin.usuarios.listar'])->syncRoles([$role1]);
+
+        Permission::create(['name' => 'dashboard_secretario'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'secretarios.crear'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'secretarios.editar'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'secretarios.listar'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'docentes.crear'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'docentes.editar'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'docentes.listar'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'paralelo.crear'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'paralelo.eliminar'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'paralelo.editar'])->syncRoles([$role1, $role3]);
+        Permission::create(['name' => 'paralelo.listar'])->syncRoles([$role1, $role3]);
+
+        Permission::create(['name' => 'dashboard_docente'])->syncRoles([$role2]);
+
+        Permission::create(['name' => 'dashboard_alumno'])->syncRoles([$role4]);
+        Permission::create(['name' => 'alumno_descuento'])->syncRoles([$role4]);
+        Permission::create(['name' => 'alumno_pago'])->syncRoles([$role4]);
+
+        Permission::create(['name' => 'dashboard_postulante'])->syncRoles([$role5]);
     }
 }

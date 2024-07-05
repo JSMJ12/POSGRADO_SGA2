@@ -34,10 +34,10 @@ class DashboardAlumnoController extends Controller
             }
         ]);
 
-        // Preparar la lista de asignaturas y notas
+        
         $asignaturas = $alumno->matriculas->map->asignatura;
         $notas = $asignaturas->mapWithKeys(function ($asignatura) use ($alumno) {
-            // Obtener nota o establecer valores predeterminados
+    
             $nota = $asignatura->notas->first();
             $cohorte = $asignatura->cohortes->first();
             $docente = $cohorte ? $cohorte->docentes->first() : null;
@@ -50,8 +50,8 @@ class DashboardAlumnoController extends Controller
                     'examen_final' => $nota->examen_final ?? 'N/A',
                     'recuperacion' => $nota->recuperacion ?? 'N/A',
                     'total' => $nota->total ?? 'N/A',
-                    'aula' => $cohorte ? $cohorte->aula->nombre : 'N/A',
-                    'paralelo' => $cohorte ? $cohorte->aula->paralelo->nombre : 'N/A',
+                    'aula' => $cohorte && $cohorte->aula ? $cohorte->aula->nombre : 'N/A',
+                    'paralelo' => $cohorte && $cohorte->aula && $cohorte->aula->paralelo ? $cohorte->aula->paralelo->nombre : 'N/A',
                     'docente' => $docente ? $docente->nombre1 . ' ' . $docente->nombre2 . ' ' . $docente->apellidop . ' ' . $docente->apellidom : 'N/A',
                     'docente_image' => $docente ? $docente->image : 'default_image_path.jpg',
                 ]
@@ -60,6 +60,5 @@ class DashboardAlumnoController extends Controller
 
         return view('dashboard.alumno', compact('asignaturas', 'notas', 'perPage', 'alumno'));
     }
-
 
 }

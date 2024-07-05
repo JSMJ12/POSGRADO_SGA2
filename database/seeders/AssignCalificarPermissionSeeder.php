@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -12,28 +10,27 @@ class AssignCalificarPermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
     public function run()
     {
-        // Obtener el permiso "calificar"
-        $permission = Permission::where('name', 'calificar')->first();
+        // Crear el permiso "calificar" si no existe
+        $permission = Permission::firstOrCreate(['name' => 'calificar']);
 
-        if (!$permission) {
-            // Crear el permiso si no existe
-            $permission = Permission::create(['name' => 'calificar']);
+        // Roles que deben tener el permiso "calificar"
+        $roles = ['Docente', 'Administrador'];
+
+        foreach ($roles as $roleName) {
+            // Obtener o crear el rol
+            $role = Role::firstOrCreate(['name' => $roleName]);
+
+            // Asignar el permiso al rol
+            if (!$role->hasPermissionTo($permission)) {
+                $role->givePermissionTo($permission);
+            }
         }
 
-        // Obtener el rol "docente"
-        $docenteRole = Role::where('name', 'Docente')->first();
-
-        // Asignar el permiso "calificar" a todos los usuarios con el rol "docente"
-        $docentes = User::role('Docente')->get();
-        foreach ($docentes as $docente) {
-            $docente->givePermissionTo($permission);
-        }
-        $admins = User::role('Administrador')->get();
-        foreach ($admins as $admin) {
-            $admin->givePermissionTo($permission);
-        }
+        $this->command->info('Permiso "calificar" asignado a los roles Docente y Administrador.');
     }
 }

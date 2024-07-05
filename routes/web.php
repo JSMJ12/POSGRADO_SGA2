@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardPostulanteController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\ParaleloController;
+use App\Http\Controllers\PagoController;
 use App\Http\Controllers\SecretarioController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\MaestriaController;
@@ -87,7 +88,7 @@ Route::middleware(['can:dashboard_secretario'])->name('docentes.')->group(functi
     Route::put('docentes/{docente}', [DocenteController::class, 'update'])->name('update');
     Route::delete('docentes/{docente}', [DocenteController::class, 'destroy'])->name('destroy');
 });
-
+Route::post('/dashboard/docente/update-silabo', [DashboardDocenteController::class, 'updateSilabo'])->name('updateSilabo');
 // Crud paralelo
 Route::middleware(['can:dashboard_admin'])->group(function () {
     Route::resource('paralelos', ParaleloController::class)->names([
@@ -261,7 +262,6 @@ Route::get('/generar-pdf/{docenteId}/{asignaturaId}/{cohorteId}/{aulaId?}/{paral
     ->middleware(['can:dashboard_docente'])
     ->name('pdf.notas.asignatura');
 
-Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -288,6 +288,40 @@ Route::post('postulacion/{dni}/aceptar', [PostulanteController::class, 'acep_neg
 Route::resource('notificaciones', NotificacionesController::class)->only(['index', 'destroy']);
 Route::get('/cantidad-notificaciones', [NotificacionesController::class, 'contador']);
 
+// Rutas protegidas por middleware para roles específicos
+Route::middleware(['can:dashboard_alumno'])->group(function () {
+    Route::get('/pagos/pago/estudiante', [PagoController::class, 'pago'])->name('pagos.pago');
+    Route::post('/pagos/elegir-modalidad', [PagoController::class, 'elegirModalidad'])->name('pagos.elegir-modalidad');
+});
+
+Route::middleware(['can:dashboard_secretario'])->group(function () {
+    // Listar todos los pagos (equivalente a index)
+    Route::get('/pagos/dashboard', [PagoController::class, 'index'])->name('pagos.index');
+
+    Route::patch('/pagos/{pago}/verificar', [PagoController::class, 'verificar_pago'])->name('pagos.verificar');
+
+
+    // Mostrar el formulario para editar un pago (equivalente a edit)
+    Route::get('/pagos/{pago}/edit', [PagoController::class, 'edit'])->name('pagos.edit');
+
+    // Actualizar un pago existente (equivalente a update)
+    Route::put('/pagos/{pago}', [PagoController::class, 'update'])->name('pagos.update');
+    Route::patch('/pagos/{pago}', [PagoController::class, 'update']);
+
+    // Eliminar un pago (equivalente a destroy)
+    Route::delete('/pagos/{pago}', [PagoController::class, 'destroy'])->name('pagos.destroy');
+});
+
+// Listar todos los pagos (equivalente a index)
+
+// Mostrar el formulario para descuento
+Route::get('/descuento', [PagoController::class, 'showDescuentoForm'])->name('pago.descuento.form');
+
+// Procesar el descuento
+Route::post('/descuento', [PagoController::class, 'processDescuento'])->name('pago.descuento.process');
+
+// Guardar un nuevo pago (equivalente a store)
+Route::post('/pagos', [PagoController::class, 'store'])->name('pagos.store');
 
 
 

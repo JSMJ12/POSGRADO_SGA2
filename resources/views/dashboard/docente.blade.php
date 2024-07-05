@@ -12,11 +12,29 @@
             <div class="card mb-4">
                 <div class="card-header toggle-body" data-toggle="cohorte_{{ $loop->index }}">
                     <strong>{{ $asignatura['nombre'] }}</strong>
+                    <div class="card-body">
+                        @if($asignatura['silabo'])
+                            <a href="{{ asset('storage/'.$asignatura['silabo']) }}" target="_blank" class="btn btn-outline-secondary btn-sm">Ver Sílabo</a>
+                        @else
+                            <form action="{{ route('updateSilabo') }}" method="POST" class="form-silabo" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="asignatura_id" value="{{ $asignatura['id'] }}">
+                                <div class="mb-3">
+                                    <label for="silabo_{{ $asignatura['id'] }}" class="form-label">Subir Sílabo</label>
+                                    <input type="file" id="silabo_{{ $asignatura['id'] }}" name="silabo" class="form-control">
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-success btn-sm">Guardar</button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+        
                 </div>
                 @foreach ($asignatura['cohortes'] as $cohorte)
                     <div class="card-header toggle-body" data-toggle="cohorte_{{ $loop->parent->index }}_{{ $loop->index }}">
                         <strong>{{ $cohorte['nombre'] }}</strong>
-                        <span>Aula: {{ $cohorte['aula'] }} | Paralelo: {{ $cohorte['paralelo'] }} | Fecha límite: {{ $cohorte['fechaLimite'] }}</span>
+                        <span>Aula: {{ $cohorte['aula'] ?? 'N/A' }} | Paralelo: {{ $cohorte['paralelo'] ?? 'N/A' }} | Fecha límite: {{ $cohorte['fechaLimite'] }}</span>
                         <div class="float-right" id="botones">
                             <a href="{{ $cohorte['excelUrl'] }}" class="btn btn-success btn-sm">
                                 <i class="fas fa-file-excel"></i> Lista de Alumnos
@@ -70,6 +88,7 @@
                                         <td>{{ $alumno['notas']['examen_final'] ?? 'N/A' }}</td>
                                         <td>{{ $alumno['notas']['recuperacion'] ?? 'N/A' }}</td>
                                         <td>{{ $alumno['notas']['total'] ?? 'N/A' }}</td>
+
                                         <td>
                                             @if ($cohorte['pdfNotasUrl'] !== null)
                                                 <a href="{{ $alumno['verNotasUrl'] }}" class="btn btn-info btn-sm">Ver Notas</a>
@@ -101,5 +120,9 @@
             });
         });
     </script>
+@stop
+
+@section('css')
+
 @stop
 

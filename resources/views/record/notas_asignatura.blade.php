@@ -113,8 +113,12 @@
         <div style="text-align: center; font-size: 12px; margin-bottom: 20px;">
             <strong>Información de la Asignatura</strong>
             <strong>Asignatura:</strong> {{ $asignatura->nombre }}
-            <strong>Aula:</strong> {{ $aula->nombre }}
-            <strong>Paralelo:</strong> {{ $paralelo->nombre }}
+            @if($aula)
+                <strong>Aula:</strong> {{ $aula->nombre }}
+            @endif
+            @if($paralelo)
+                <strong>Paralelo:</strong> {{ $paralelo->nombre }}
+            @endif
             <strong>Periodo:</strong> {{ $periodo_academico->nombre }}
             <strong>Cohorte:</strong> {{ $cohorte->nombre }}
             <strong>Docente:</strong> {{ $docente->nombre1 }} {{ $docente->nombre2 }} {{ $docente->apellidop }}

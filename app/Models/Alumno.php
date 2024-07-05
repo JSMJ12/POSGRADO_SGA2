@@ -49,6 +49,9 @@ class Alumno extends Model
         'pdf_hojavida',
         'carta_aceptacion',
         'pago_matricula',
+        'descuento',
+        'monto_total',
+        'documento',
 
     ];
     public function notas()
@@ -62,6 +65,10 @@ class Alumno extends Model
     public function matriculas()
     {
         return $this->hasMany(Matricula::class);
+    }
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'dni', 'dni');
     }
     
 }

@@ -39,42 +39,69 @@ class CalificacionController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'docente_dni' => 'required|string',
-            'asignatura_id' => 'required|integer',
-            'cohorte_id' => 'required|integer',
-            'alumno_dni' => 'required|array',
-            'nota_actividades' => 'nullable|array',
-            'nota_practicas' => 'nullable|array',
-            'nota_autonomo' => 'nullable|array',
-            'examen_final' => 'nullable|array',
-            'recuperacion' => 'nullable|array',
-            'total' => 'nullable|array',
-        ]);
+{
+    $request->validate([
+        'docente_dni' => 'required|string',
+        'asignatura_id' => 'required|integer',
+        'cohorte_id' => 'required|integer',
+        'alumno_dni' => 'required|array',
+        'nota_actividades' => 'nullable|array',
+        'nota_practicas' => 'nullable|array',
+        'nota_autonomo' => 'nullable|array',
+        'examen_final' => 'nullable|array',
+        'recuperacion' => 'nullable|array',
+        'total' => 'nullable|array',
+    ]);
 
-        $docenteDni = $request->input('docente_dni');
-        $asignaturaId = $request->input('asignatura_id');
-        $cohorteId = $request->input('cohorte_id');
-        $alumnoDnis = $request->input('alumno_dni');
-        $notas = $request->only(['nota_actividades', 'nota_practicas', 'nota_autonomo', 'examen_final', 'recuperacion', 'total']);
+    $docenteDni = $request->input('docente_dni');
+    $asignaturaId = $request->input('asignatura_id');
+    $cohorteId = $request->input('cohorte_id');
+    $alumnoDnis = $request->input('alumno_dni');
+    $notas = $request->only(['nota_actividades', 'nota_practicas', 'nota_autonomo', 'examen_final', 'recuperacion', 'total']);
 
+    $calificacionVerificacion = CalificacionVerificacion::where([
+        'docente_dni' => $docenteDni,
+        'asignatura_id' => $asignaturaId,
+        'cohorte_id' => $cohorteId
+    ])->first();
+
+    if ($calificacionVerificacion) {
+        $calificacionVerificacion->calificado = 1;
+        $calificacionVerificacion->editar = 0;
+        $calificacionVerificacion->save();
+    }
+
+    try {
         foreach ($alumnoDnis as $alumnoDni) {
             Nota::updateOrCreate(
-                ['docente_dni' => $docenteDni, 'alumno_dni' => $alumnoDni, 'asignatura_id' => $asignaturaId, 'cohorte_id' => $cohorteId],
-                array_merge([
+                [
                     'docente_dni' => $docenteDni,
                     'alumno_dni' => $alumnoDni,
                     'asignatura_id' => $asignaturaId,
-                    'cohorte_id' => $cohorteId
-                ], array_map(function($field) use ($notas, $alumnoDni) {
-                    return $notas[$field][$alumnoDni] ?? null;
-                }, array_keys($notas)))
+                    'cohorte_id' => $cohorteId,
+                ],
+                [
+                    'docente_dni' => $docenteDni,
+                    'alumno_dni' => $alumnoDni,
+                    'asignatura_id' => $asignaturaId,
+                    'cohorte_id' => $cohorteId,
+                    'nota_actividades' => $notas['nota_actividades'][$alumnoDni] ?? null,
+                    'nota_practicas' => $notas['nota_practicas'][$alumnoDni] ?? null,
+                    'nota_autonomo' => $notas['nota_autonomo'][$alumnoDni] ?? null,
+                    'examen_final' => $notas['examen_final'][$alumnoDni] ?? null,
+                    'recuperacion' => $notas['recuperacion'][$alumnoDni] ?? null,
+                    'total' => $notas['total'][$alumnoDni] ?? null,
+                ]
             );
         }
-
         return redirect()->route('dashboard_docente')->with('success', 'Calificaciones almacenadas exitosamente');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error al intentar guardar las calificaciones: ' . $e->getMessage());
     }
+
+    return redirect()->route('dashboard_docente')->with('success', 'Calificaciones almacenadas exitosamente');
+}
+
 
     public function edit($alumno_dni, $docente_dni, $asignatura_id, $cohorte_id)
     {

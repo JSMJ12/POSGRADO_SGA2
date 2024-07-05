@@ -10,7 +10,10 @@ use App\Models\CohorteDocente;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AlumnosExport;
 use App\Models\Nota;
+use App\Models\Asignatura;
 use App\Models\CalificacionVerificacion;
+use Illuminate\Support\Facades\Storage;
+
 class DashboardDocenteController extends Controller
 {
     public function __construct()
@@ -24,20 +27,25 @@ class DashboardDocenteController extends Controller
         $user = auth()->user();
         $docente = Docente::where('email', $user->email)->firstOrFail();
         $asignaturas = $docente->asignaturas;
-        
-        $data = $asignaturas->map(function ($asignatura) use ($docente, &$notasExisten) { 
+    
+        $data = $asignaturas->map(function ($asignatura) use ($docente) {
             return [
                 'nombre' => $asignatura->nombre,
-                'cohortes' => $asignatura->cohortes->sortBy('periodo_academico.fecha_fin')->map(function ($cohorte) use ($docente, $asignatura, &$notasExisten, &$calificarUrlParamsArray) {
+                'id' => $asignatura->id,
+                'silabo' => $asignatura->silabo,
+                'cohortes' => $asignatura->cohortes->sortBy('periodo_academico.fecha_fin')->map(function ($cohorte) use ($docente, $asignatura) {
                     $fechaFinCohorte = $cohorte->periodo_academico->fecha_fin;
                     $fechaLimite = $fechaFinCohorte->addWeek();
+        
+                    // Obtener las notas existen array
+                    $notasExisten = [];
         
                     $notasExisten[$cohorte->id] = Nota::where([
                         'docente_dni' => $docente->dni,
                         'asignatura_id' => $asignatura->id,
                         'cohorte_id' => $cohorte->id,
                     ])->exists();
-                    
+        
                     // Obtener la instancia de CalificacionVerificacion
                     $calificacionVerificacion = CalificacionVerificacion::where([
                         'docente_dni' => $docente->dni,
@@ -46,18 +54,10 @@ class DashboardDocenteController extends Controller
                     ])->first();
         
                     // Obtener el valor de la propiedad 'editar' o establecerlo en false si no hay instancia
-                    $editar = $calificacionVerificacion ? $calificacionVerificacion->editar : null;
+                    $editar = $calificacionVerificacion ? $calificacionVerificacion->editar : false;
+        
                     $aulaId = $cohorte->aula ? $cohorte->aula->id : null;
                     $paraleloId = $cohorte->aula && $cohorte->aula->paralelo ? $cohorte->aula->paralelo->id : null;
-                    $calificarUrlParams = [
-                        $docente->dni,
-                        $asignatura->id,
-                        $cohorte->id,
-                        $aulaId,
-                        $paraleloId,
-                        $notasExisten[$cohorte->id] 
-                    ];
-                    $calificarUrlParamsArray[] = $calificarUrlParams;
         
                     return [
                         'nombre' => $cohorte->nombre,
@@ -67,55 +67,115 @@ class DashboardDocenteController extends Controller
                         'docenteId' => $docente->dni,
                         'asignaturaId' => $asignatura->id,
                         'cohorteId' => $cohorte->id,
-                        'pdfNotasUrl' => $notasExisten[$cohorte->id] && $cohorte->aula && $cohorte->aula->paralelo ? route('pdf.notas.asignatura', [
+                        'pdfNotasUrl' => $notasExisten[$cohorte->id] ? route('pdf.notas.asignatura', [
                             'docenteId' => $docente->dni,
                             'asignaturaId' => $asignatura->id,
                             'cohorteId' => $cohorte->id,
-                            'aulaId' => $cohorte->aula->id,
-                            'paraleloId' => $cohorte->aula->paralelo->id,
+                            'aulaId' => $aulaId,
+                            'paraleloId' => $paraleloId,
                         ]) : null,
-                        'excelUrl' => $cohorte->aula && $cohorte->aula->paralelo ? route('exportar.excel', [
+                        'excelUrl' => route('exportar.excel', [
                             'docenteId' => $docente->dni,
                             'asignaturaId' => $asignatura->id,
                             'cohorteId' => $cohorte->id,
-                            'aulaId' => $cohorte->aula->id,
-                            'paraleloId' => $cohorte->aula->paralelo->id,
+                            'aulaId' => $aulaId ?? null,
+                            'paraleloId' => $paraleloId ?? null,
+                        ]),
+                        'calificarUrl' => $editar ? route('calificaciones.create1', [
+                            'docente_id' => $docente->dni,
+                            'asignatura_id' => $asignatura->id,
+                            'cohorte_id' => $cohorte->id,
+                            'aula_id' => $aulaId,
+                            'paralelo_id' => $paraleloId,
+                            'notasExisten' => $notasExisten[$cohorte->id],
                         ]) : null,
-                        'calificarUrl' => $editar && $cohorte->aula && $cohorte->aula->paralelo ? route('calificaciones.create1', end($calificarUrlParamsArray)) : null,
                         'alumnos' => $cohorte->matriculas->unique('alumno_dni')->map(function ($matricula) use ($docente, $asignatura, $cohorte) {
+                            // Obtener las notas del alumno
+                            $notas = Nota::where([
+                                'alumno_dni' => $matricula->alumno->dni,
+                                'docente_dni' => $docente->dni,
+                                'asignatura_id' => $asignatura->id,
+                                'cohorte_id' => $cohorte->id,
+                            ])->first();
+        
                             return [
                                 'imagen' => asset($matricula->alumno->image),
                                 'nombreCompleto' => $matricula->alumno->apellidop . ' ' . $matricula->alumno->apellidom . ' ' . $matricula->alumno->nombre1 . ' ' . $matricula->alumno->nombre2,
-                                'verNotasUrl' => route('calificaciones.show1',  [$matricula->alumno->dni, $docente->dni, $asignatura->id, $cohorte->id]),
+                                'verNotasUrl' => route('calificaciones.show1', [
+                                    'alumno_id' => $matricula->alumno->dni,
+                                    'docente_id' => $docente->dni,
+                                    'asignatura_id' => $asignatura->id,
+                                    'cohorte_id' => $cohorte->id,
+                                ]),
+                                'notas' => [
+                                    'nota_actividades' => $notas ? $notas->nota_actividades : 'N/A',
+                                    'nota_practicas' => $notas ? $notas->nota_practicas : 'N/A',
+                                    'nota_autonomo' => $notas ? $notas->nota_autonomo : 'N/A',
+                                    'examen_final' => $notas ? $notas->examen_final : 'N/A',
+                                    'recuperacion' => $notas ? $notas->recuperacion : 'N/A',
+                                    'total' => $notas ? $notas->total : 'N/A',
+                                ],
                             ];
                         }),
                     ];
-                    
-                })->values(), 
+                }),
             ];
         });
-        
-        return view('dashboard.docente', compact('docente', 'asignaturas', 'perPage', 'data', 'notasExisten'));
+        return view('dashboard.docente', compact('docente', 'asignaturas', 'perPage', 'data'));
     }
-
-    public function exportarExcel($docenteId, $asignaturaId, $cohorteId, $aulaId, $paraleloId)
+    public function updateSilabo(Request $request)
     {
-        $alumnosMatriculados = Alumno::whereHas('matriculas', function ($query) use ($asignaturaId, $cohorteId, $docenteId) {
-            $query->where('asignatura_id', $asignaturaId)
-                  ->where('cohorte_id', $cohorteId)
-                  ->where('docente_dni', $docenteId);
-        })
-        ->with(['matriculas', 'matriculas.asignatura', 'matriculas.cohorte', 'matriculas.docente'])
-        ->get();
+        $request->validate([
+            'asignatura_id' => 'required|exists:asignaturas,id',
+            'silabo' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // Limita a archivos específicos
+        ]);
 
-        $cohorte = $alumnosMatriculados->first()->matriculas->first()->cohorte;
-        $nombreCohorte = $cohorte ? $cohorte->nombre : 'sin_cohorte';
-        $paralelo = $cohorte->aula->paralelo->nombre;
-        $aula = $cohorte->aula->nombre;
-        $asignatura = $alumnosMatriculados->first()->matriculas->first()->asignatura->nombre;
-    
-        return Excel::download(new AlumnosExport($alumnosMatriculados), "alumnos_{$nombreCohorte}_{$asignatura}_{$aula}_{$paralelo}.xlsx");
-    
+        $asignatura = Asignatura::findOrFail($request->input('asignatura_id'));
+
+        if ($request->hasFile('silabo')) {
+            if ($asignatura->silabo && Storage::exists($asignatura->silabo)) {
+                Storage::delete($asignatura->silabo);
+            }
+            $path = $request->file('silabo')->store('silabos', 'public');
+            $asignatura->silabo = $path;
+        }
+
+        $asignatura->save();
+
+        return redirect()->route('inicio')->with('success', 'Sílabo actualizado correctamente.');
     }
+    public function exportarExcel($docenteId, $asignaturaId, $cohorteId, $aulaId = null, $paraleloId = null)
+    {
+        $query = Alumno::whereHas('matriculas', function ($query) use ($asignaturaId, $cohorteId, $docenteId) {
+            $query->where('asignatura_id', $asignaturaId)
+                ->where('cohorte_id', $cohorteId)
+                ->where('docente_dni', $docenteId);
+        })
+        ->with(['matriculas', 'matriculas.asignatura', 'matriculas.cohorte', 'matriculas.docente']);
+
+        if ($aulaId !== null) {
+            $query->whereHas('matriculas.cohorte.aula', function ($q) use ($aulaId) {
+                $q->where('id', $aulaId);
+            });
+        }
+
+        if ($paraleloId !== null) {
+            $query->whereHas('matriculas.cohorte.aula.paralelo', function ($q) use ($paraleloId) {
+                $q->where('id', $paraleloId);
+            });
+        }
+
+        $alumnosMatriculados = $query->get();
+
+        $primerAlumno = $alumnosMatriculados->first();
+        $nombreCohorte = $primerAlumno ? ($primerAlumno->matriculas->first()->cohorte->nombre ?? 'sin_cohorte') : 'sin_cohorte';
+        $asignatura = $primerAlumno ? $primerAlumno->matriculas->first()->asignatura->nombre : 'sin_asignatura';
+
+        $aula = $aulaId ? Aula::find($aulaId)->nombre : 'sin_aula';
+        $paralelo = $paraleloId ? Paralelo::find($paraleloId)->nombre : 'sin_paralelo';
+
+        return Excel::download(new AlumnosExport($alumnosMatriculados), "alumnos_{$nombreCohorte}_{$asignatura}_{$aula}_{$paralelo}.xlsx");
+    }
+
 
 }
