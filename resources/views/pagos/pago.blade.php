@@ -22,6 +22,7 @@
                     <p><strong>DNI:</strong> {{ $alumno->dni }}</p>
                     <p><strong>Maestría:</strong> {{ $programa['nombre'] }}</p>
                     <p><strong>Arancel:</strong> ${{ number_format($programa['arancel'], 2) }}</p>
+                    <p><strong>Deuda Total:</strong> ${{ number_format($alumno->monto_total, 2) }}</p>
                 </div>
             </div>
         </div>
@@ -65,7 +66,7 @@
                         <!-- Campo de monto ajustable según la modalidad -->
                         <div class="form-group">
                             <label for="monto">Monto a Pagar:</label>
-                            <input type="number" class="form-control" id="monto" name="monto" step="0.01" value="{{ $programa['total_pagar'] }}" readonly>
+                            <input type="number" class="form-control" id="monto" name="monto" step="0.01" value="{{ $alumno->monto_total }}" readonly>
                         </div>
                 
                         <!-- Fecha de pago -->
@@ -89,6 +90,44 @@
                 </div>
             </div>
             
+            <!-- Tabla de pagos realizados -->
+            <div class="payment-history-box mt-4">
+                <div class="payment-history-header">
+                    <h3>Historial de Pagos Realizados</h3>
+                </div>
+                <div class="payment-history-body">
+                    <table class="table table-striped" id="pagosTable">
+                        <thead>
+                            <tr>
+                                <th>Monto</th>
+                                <th>Fecha de Pago</th>
+                                <th>Comprobante</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($pagos as $pago)
+                            <tr>
+                                <td>${{ number_format($pago->monto, 2) }}</td>
+                                <td>{{ $pago->fecha_pago }}</td>
+                                <td>
+                                    <a href="{{ asset('storage/' . $pago->archivo_comprobante) }}" target="_blank" class="btn btn-info btn-sm" title="Ver Comprobante">
+                                        <i class="fas fa-file-alt"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    @if ($pago->verificado)
+                                        <span class="badge badge-success">Verificado</span>
+                                    @else
+                                        <span class="badge badge-danger">No Verificado</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -96,7 +135,7 @@
 
 @section('css')
 <style>
-    .info-box, .payment-details-box, .payment-method-box {
+    .info-box, .payment-details-box, .payment-history-box {
         background-color: white;
         border: 3px solid #28a745;
         border-radius: 10px;
@@ -104,7 +143,7 @@
         margin-bottom: 20px;
     }
 
-    .info-header, .payment-details-header, .payment-method-header {
+    .info-header, .payment-details-header, .payment-history-header {
         text-align: center;
         background-color: #28a745;
         color: white;
@@ -113,7 +152,7 @@
         margin: -20px -20px 20px -20px;
     }
 
-    .info-body, .payment-details-body, .payment-method-body {
+    .info-body, .payment-details-body, .payment-history-body {
         padding: 10px;
     }
 
@@ -129,12 +168,12 @@
     }
 
     @media (max-width: 768px) {
-        .info-box, .payment-details-box, .payment-method-box {
+        .info-box, .payment-details-box, .payment-history-box {
             margin-left: 0;
             margin-right: 0;
         }
 
-        .info-header, .payment-details-header, .payment-method-header {
+        .info-header, .payment-details-header, .payment-history-header {
             text-align: center;
         }
     }
@@ -147,12 +186,12 @@
     function updatePaymentDetails() {
         var modalidadPago = document.getElementById('modalidad_pago').value;
         var montoInput = document.getElementById('monto');
-        var totalPagar = {{ $programa['total_pagar'] }};
+        var montoTotal = {{ $alumno->monto_total }};
         
         if (modalidadPago === 'unico') {
-            montoInput.value = totalPagar;
+            montoInput.value = montoTotal;
         } else if (modalidadPago === 'trimestral') {
-            montoInput.value = (totalPagar / 3).toFixed(2);
+            montoInput.value = (montoTotal / 3).toFixed(2);
         }
     }
 
@@ -160,6 +199,4 @@
     document.getElementById('modalidad_pago').addEventListener('change', updatePaymentDetails);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
 @stop

@@ -20,6 +20,8 @@ class InicioController extends Controller
             return redirect()->route('dashboard_alumno');
         }elseif (auth()->user()->hasRole('Postulante')) {
             return redirect()->route('dashboard_postulante');
+        }elseif (auth()->user()->hasRole('secretario_epsu')) {
+            return redirect()->route('dashboard_secretario_epsu');
         }
     }
 }

@@ -82,13 +82,16 @@
                                         <td>
                                             <img src="{{ asset($alumno['imagen']) }}" alt="Imagen del alumno" class="img-thumbnail rounded-circle" style="width: 80px;">
                                         </td>
-                                        <td>{{ $alumno['notas']['nota_actividades'] ?? 'N/A' }}</td>
-                                        <td>{{ $alumno['notas']['nota_practicas'] ?? 'N/A' }}</td>
-                                        <td>{{ $alumno['notas']['nota_autonomo'] ?? 'N/A' }}</td>
-                                        <td>{{ $alumno['notas']['examen_final'] ?? 'N/A' }}</td>
-                                        <td>{{ $alumno['notas']['recuperacion'] ?? 'N/A' }}</td>
-                                        <td>{{ $alumno['notas']['total'] ?? 'N/A' }}</td>
-
+                                        @if ($alumno['notas']['nota_actividades'] !== 'N/A' || $alumno['notas']['nota_practicas'] !== 'N/A' || $alumno['notas']['nota_autonomo'] !== 'N/A' || $alumno['notas']['examen_final'] !== 'N/A' || $alumno['notas']['recuperacion'] !== 'N/A')
+                                            <td>{{ $alumno['notas']['nota_actividades'] }}</td>
+                                            <td>{{ $alumno['notas']['nota_practicas'] }}</td>
+                                            <td>{{ $alumno['notas']['nota_autonomo'] }}</td>
+                                            <td>{{ $alumno['notas']['examen_final'] }}</td>
+                                            <td>{{ $alumno['notas']['recuperacion'] }}</td>
+                                            <td>{{ $alumno['notas']['total'] }}</td>
+                                        @else
+                                            <td colspan="6">Notas no disponibles</td>
+                                        @endif
                                         <td>
                                             @if ($cohorte['pdfNotasUrl'] !== null)
                                                 <a href="{{ $alumno['verNotasUrl'] }}" class="btn btn-info btn-sm">Ver Notas</a>
@@ -104,6 +107,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        
                     </div>
                 @endforeach
             </div>

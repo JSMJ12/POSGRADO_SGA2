@@ -5,6 +5,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\DashboardDocenteController;
 use App\Http\Controllers\DashboardSecretarioController;
+use App\Http\Controllers\DashboardSecretarioEpsuController;
 use App\Http\Controllers\DashboardAlumnoController;
 use App\Http\Controllers\DashboardPostulanteController;
 use App\Http\Controllers\UsuarioController;
@@ -34,7 +35,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PostulanteController;
 use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\NotificacionesController;
-
+use App\Http\Controllers\PerfilAlumnoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,11 +54,15 @@ Auth::routes();
 
 Route::post('/guardar-cambios', [DocenteController::class, 'guardarCambios'])->name('guardarCambios');
 
+Route::get('/actualizar_perfil', [PerfilAlumnoController::class, 'edit'])->name('edit_datosAlumnos');
+Route::post('/actualizar_perfil/procesar', [PerfilAlumnoController::class, 'update'])->name('update_datosAlumnos');
+
 Route::get('/dashboard/admin', [DashboardAdminController::class, 'index'])->middleware('can:dashboard_admin')->name('dashboard_admin');
 
 Route::get('/dashboard/docente', [DashboardDocenteController::class, 'index'])->middleware('can:dashboard_docente')->name('dashboard_docente');
 
 Route::get('/dashboard/secretario', [DashboardSecretarioController::class, 'index'])->middleware('can:dashboard_secretario')->name('dashboard_secretario');
+Route::get('/dashboard/secretario/epsu', [DashboardSecretarioEpsuController::class, 'index'])->middleware('can:epsu_dashboard')->name('dashboard_secretario_epsu');
 Route::post('/postulantes/{dni}/convertir', [PostulanteController::class, 'convertirEnEstudiante'])->middleware('can:dashboard_secretario')->name('postulantes.convertir');
 
 Route::get('/dashboard/alumno', [DashboardAlumnoController::class, 'index'])->middleware('can:dashboard_alumno')->name('dashboard_alumno');

@@ -354,6 +354,12 @@ return [
             'can' => 'alumno_descuento', 
         ],
         [
+            'text' => 'Datos Personales',
+            'route' => 'edit_datosAlumnos',
+            'icon' => 'fas fa-fw fa-user',
+            'can' => 'alumno_descuento', 
+        ],
+        [
             'text' => 'Descuento',
             'route' => 'pago.descuento.form',
             'icon' => 'fas fa-fw fa-dollar-sign',

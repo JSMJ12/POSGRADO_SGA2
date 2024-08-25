@@ -18,6 +18,8 @@ class CalificacionController extends Controller
 
     public function create($docente_dni, $asignatura_id, $cohorte_id)
     {
+        $cohorte = Cohorte::findOrFail($cohorteId);
+        $aforoMaximo = $cohorte->aforo;
         // Obtener matrículas
         $matriculas = Matricula::where([
             'docente_dni' => $docente_dni,
@@ -35,7 +37,7 @@ class CalificacionController extends Controller
             ])->get()
             ->keyBy('alumno_dni');
 
-        return view('calificaciones.create', compact('alumnos', 'notas', 'docente_dni', 'asignatura_id', 'cohorte_id'));
+        return view('calificaciones.create', compact('alumnos', 'aforoMaximo', 'notas', 'docente_dni', 'asignatura_id', 'cohorte_id'));
     }
 
     public function store(Request $request)

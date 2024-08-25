@@ -8,11 +8,16 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <!-- Gráficos -->
+        <!-- Gráfico de Pagos Realizados -->
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h3>Pagos Realizados</h3>
+                    <div class="btn-group" role="group" aria-label="Tipos de análisis">
+                        <button type="button" class="btn btn-secondary" id="analisisDia">Día</button>
+                        <button type="button" class="btn btn-secondary" id="analisisMes">Mes</button>
+                        <button type="button" class="btn btn-secondary" id="analisisAnio">Año</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <canvas id="pagosChart"></canvas>
@@ -20,13 +25,19 @@
             </div>
         </div>
 
+        <!-- Gráfico de Cantidad de Pagos Realizados -->
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h3>Alumnos con Pagos Pendientes</h3>
+                    <h3>Cantidad de Pagos Realizados</h3>
+                    <div class="btn-group" role="group" aria-label="Tipos de análisis">
+                        <button type="button" class="btn btn-secondary" id="cantidadDia">Día</button>
+                        <button type="button" class="btn btn-secondary" id="cantidadMes">Mes</button>
+                        <button type="button" class="btn btn-secondary" id="cantidadAnio">Año</button>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <canvas id="alumnosPendientesChart"></canvas>
+                    <canvas id="cantidadPagosChart"></canvas>
                 </div>
             </div>
         </div>
@@ -49,7 +60,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($pagosDia as $pago)
+                            @foreach($todosPagos as $pago)
                             <tr>
                                 <td>{{ $pago->dni }}</td>
                                 <td>${{ number_format($pago->monto, 2) }}</td>
@@ -86,25 +97,38 @@
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Inicializar DataTable
-        $('#pagosTable').DataTable();
-        
-        // Datos para el gráfico de pagos realizados
-        var ctx = document.getElementById('pagosChart').getContext('2d');
-        var pagosChart = new Chart(ctx, {
-            type: 'bar',
+        $('#pagosTable').DataTable({
+            paging: true, // Asegúrate de que la paginación esté habilitada
+            lengthMenu: [5, 10, 15, 20, 40, 45, 50, 100], 
+            pageLength: {{ $perPage }},
+            responsive: true, 
+            colReorder: true,
+            keys: true,
+            autoFill: true, 
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+            }
+        });
+        // Configuración inicial del gráfico de pagos realizados
+        var ctxPagos = document.getElementById('pagosChart').getContext('2d');
+        var pagosChart = new Chart(ctxPagos, {
+            type: 'line',
             data: {
-                labels: ['Hoy', 'Este Mes', 'Este Año'],
+                labels: [], // Etiquetas se actualizarán dinámicamente
                 datasets: [{
                     label: 'Monto Total Pagado',
-                    data: [{{ $pagosDiaTotal }}, {{ $pagosMesTotal }}, {{ $pagosAnioTotal }}],
-                    backgroundColor: ['rgba(54, 162, 235, 0.2)'],
-                    borderColor: ['rgba(54, 162, 235, 1)'],
-                    borderWidth: 1
+                    data: [], // Datos se actualizarán dinámicamente
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    fill: false
                 }]
             },
             options: {
                 scales: {
+                    x: {
+                        beginAtZero: true
+                    },
                     y: {
                         beginAtZero: true
                     }
@@ -112,42 +136,98 @@
             }
         });
 
-        // Datos para el gráfico de alumnos con pagos pendientes
-        var ctx2 = document.getElementById('alumnosPendientesChart').getContext('2d');
-        var alumnosPendientesChart = new Chart(ctx2, {
-            type: 'pie',
+        // Configuración inicial del gráfico de cantidad de pagos realizados
+        var ctxCantidad = document.getElementById('cantidadPagosChart').getContext('2d');
+        var cantidadPagosChart = new Chart(ctxCantidad, {
+            type: 'line',
             data: {
-                labels: [
-                    @foreach($alumnosPendientes as $alumno)
-                        "{{ $alumno->nombre1 }} {{ $alumno->apellido_paterno }}",
-                    @endforeach
-                ],
+                labels: [], // Etiquetas se actualizarán dinámicamente
                 datasets: [{
-                    label: 'Alumnos con Pagos Pendientes',
-                    data: [
-                        @foreach($alumnosPendientes as $alumno)
-                            1,
-                        @endforeach
-                    ],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
+                    label: 'Cantidad de Pagos Realizados',
+                    data: [], // Datos se actualizarán dinámicamente
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
                 }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
+        });
+
+        // Función para actualizar los gráficos
+        function updateChart(chart, labels, data) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = data;
+            chart.update();
+        }
+
+        // Función para actualizar el gráfico de pagos realizados
+        function updatePagosChart(type) {
+            var labels = [];
+            var data = [];
+
+            if (type === 'dia') {
+                labels = @json($pagosPorHora->keys());
+                data = @json($pagosPorHora->values());
+            } else if (type === 'mes') {
+                labels = @json($pagosPorDia->keys());
+                data = @json($pagosPorDia->values());
+            } else if (type === 'anio') {
+                labels = @json($pagosPorMes->keys());
+                data = @json($pagosPorMes->values());
+            }
+
+            updateChart(pagosChart, labels, data);
+        }
+
+        // Función para actualizar el gráfico de cantidad de pagos realizados
+        function updateCantidadChart(type) {
+            var labels = [];
+            var data = [];
+
+            if (type === 'dia') {
+                labels = @json($cantidadPorHora->keys());
+                data = @json($cantidadPorHora->values());
+            } else if (type === 'mes') {
+                labels = @json($cantidadPorDia->keys());
+                data = @json($cantidadPorDia->values());
+            } else if (type === 'anio') {
+                labels = @json($cantidadPorMes->keys());
+                data = @json($cantidadPorMes->values());
+            }
+
+            updateChart(cantidadPagosChart, labels, data);
+        }
+
+        // Manejar los clics de los botones para el gráfico de pagos realizados
+        $('#analisisDia').click(function() {
+            updatePagosChart('dia');
+        });
+        $('#analisisMes').click(function() {
+            updatePagosChart('mes');
+        });
+        $('#analisisAnio').click(function() {
+            updatePagosChart('anio');
+        });
+
+        // Manejar los clics de los botones para el gráfico de cantidad de pagos realizados
+        $('#cantidadDia').click(function() {
+            updateCantidadChart('dia');
+        });
+        $('#cantidadMes').click(function() {
+            updateCantidadChart('mes');
+        });
+        $('#cantidadAnio').click(function() {
+            updateCantidadChart('anio');
         });
     });
 </script>
@@ -157,7 +237,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 <style>
     .card-header {
-        background-color: #079c36;
+        background-color: #3b8b54;
         color: white;
     }
     .card-body {

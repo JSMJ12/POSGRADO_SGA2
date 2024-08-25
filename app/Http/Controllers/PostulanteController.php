@@ -244,7 +244,7 @@ class PostulanteController extends Controller
                 'tipo_discapacidad' => $postulante->tipo_discapacidad,
                 'porcentaje_discapacidad' => $postulante->porcentaje_discapacidad,
                 'contra' => bcrypt($postulante->dni), 
-                'image' => $postulante->image,
+                'image' => $postulante->imagen,
                 'maestria_id' => $postulante->maestria_id,
                 'celular' => $postulante->celular,
                 'titulo_profesional' => $postulante->titulo_profesional,
@@ -262,19 +262,20 @@ class PostulanteController extends Controller
                 'pdf_hojavida' => $pdf_hojavida_path,
                 'carta_aceptacion' => $carta_aceptacion_path,
                 'pago_matricula' => $pago_matricula_path,
+                'monto_total' => $postulante->maestria->arancel,
             ]);
             $user = User::where('name', $postulante->nombre1)
                         ->where('apellido', $postulante->apellidop)
                         ->where('email', $postulante->correo_electronico)
                         ->first();
-
             if ($user) {
                 $user->assignRole('Alumno');
                 $user->removeRole('Postulante');
+                
                 $user->email = $email_institucional;
                 $user->save();
             }
-            Notification::route('mail', $usuario->email)
+            Notification::route('mail', $user->email)
             ->notify(new NuevoUsuarioNotification($usuario, $request->input('dni'), $usuario->name));
             $postulante->delete();
 

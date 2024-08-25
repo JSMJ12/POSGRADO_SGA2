@@ -10,37 +10,60 @@ use Illuminate\Support\Facades\Auth;
 
 class PagoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->input('perPage', 10);
         $hoy = now()->startOfDay();
         $mes = now()->startOfMonth();
         $anio = now()->startOfYear();
-
-        // Pagos del día
-        $pagosDia = Pago::whereDate('fecha_pago', $hoy)->get();
-        $pagosDiaTotal = $pagosDia->sum('monto');
-
-        // Pagos del mes
-        $pagosMes = Pago::whereBetween('fecha_pago', [$mes, now()])->get();
-        $pagosMesTotal = $pagosMes->sum('monto');
-
-        // Pagos del año
-        $pagosAnio = Pago::whereBetween('fecha_pago', [$anio, now()])->get();
-        $pagosAnioTotal = $pagosAnio->sum('monto');
-
-        // Alumnos con pagos pendientes
-        $alumnosPendientes = Pago::where('verificado', false)->get();
-
+    
+        // Todos los pagos
+        $todosPagos = Pago::orderBy('fecha_pago')->get();
+    
+        // Pagos por hora del día
+        $pagosPorHora = $todosPagos->where('fecha_pago', '>=', $hoy)->groupBy(function($pago) {
+            return \Carbon\Carbon::parse($pago->fecha_pago)->format('H:00');
+        })->map->sum('monto');
+    
+        // Pagos por día del mes
+        $pagosPorDia = $todosPagos->where('fecha_pago', '>=', $mes)->groupBy(function($pago) {
+            return \Carbon\Carbon::parse($pago->fecha_pago)->format('d');
+        })->map->sum('monto');
+    
+        // Pagos por mes del año
+        $pagosPorMes = $todosPagos->where('fecha_pago', '>=', $anio)->groupBy(function($pago) {
+            return \Carbon\Carbon::parse($pago->fecha_pago)->format('F');
+        })->map->sum('monto');
+    
+        // Cantidad de pagos realizados
+        $cantidadPorHora = $todosPagos->where('fecha_pago', '>=', $hoy)->groupBy(function($pago) {
+            return \Carbon\Carbon::parse($pago->fecha_pago)->format('H:00');
+        })->map->count();
+    
+        $cantidadPorDia = $todosPagos->where('fecha_pago', '>=', $mes)->groupBy(function($pago) {
+            return \Carbon\Carbon::parse($pago->fecha_pago)->format('d');
+        })->map->count();
+    
+        $cantidadPorMes = $todosPagos->where('fecha_pago', '>=', $anio)->groupBy(function($pago) {
+            return \Carbon\Carbon::parse($pago->fecha_pago)->format('F');
+        })->map->count();
+    
+        // Pagos por verificar
+        $pagosPorVerificar = Pago::where('verificado', false)->count();
+    
         return view('pagos.index', [
-            'pagosDia' => $pagosDia,
-            'pagosMes' => $pagosMes,
-            'pagosAnio' => $pagosAnio,
-            'pagosDiaTotal' => $pagosDiaTotal,
-            'pagosMesTotal' => $pagosMesTotal,
-            'pagosAnioTotal' => $pagosAnioTotal,
-            'alumnosPendientes' => $alumnosPendientes
-        ]);
+            'pagosPorHora' => $pagosPorHora,
+            'pagosPorDia' => $pagosPorDia,
+            'pagosPorMes' => $pagosPorMes,
+            'todosPagos' => $todosPagos,
+            'cantidadPorHora' => $cantidadPorHora,
+            'cantidadPorDia' => $cantidadPorDia,
+            'cantidadPorMes' => $cantidadPorMes,
+            'pagosPorVerificar' => $pagosPorVerificar,
+            'alumnosPendientes' => Pago::where('verificado', false)->with('alumno')->get()->unique('alumno_id'),
+        ], compact('perPage'));
     }
+    
 
     public function pago()
     {
@@ -86,8 +109,11 @@ class PagoController extends Controller
             'total_pagar' => $total_pagar,
         ];
 
-        return view('pagos.pago', compact('programa', 'alumno'));
+        $pagos = $alumno->pagos; 
+
+        return view('pagos.pago', compact('programa', 'alumno', 'pagos'));
     }
+
 
     public function store(Request $request)
     {
@@ -191,8 +217,6 @@ class PagoController extends Controller
 
         $request->validate([
             'descuento' => 'required',
-            'modalidad_pago' => 'required',
-            'documento' => 'sometimes|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
         // Guardar el descuento seleccionado en el alumno
@@ -242,7 +266,7 @@ class PagoController extends Controller
         $alumno->save();
 
         // Redirigir con un mensaje de éxito
-        return redirect()->back()->with('success', 'Descuento aplicado correctamente. El monto total a pagar se ha actualizado.');
+        return redirect()->route('inicio');
     }
     public function verificar_pago($id)
     {
