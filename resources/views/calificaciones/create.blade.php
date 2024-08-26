@@ -25,30 +25,34 @@
                         </thead>
                         <tbody>
                             @if (count($alumnos) > 0)
-                                @foreach ($alumnos as $alumno)
-                                    <tr>
-                                        <td>{{ $alumno->nombre1 }} {{ $alumno->apellidop }}</td>
-                                        <input type="hidden" name="alumno_dni[]" value="{{ $alumno->dni }}">
-                                        <td>
-                                            <input class="form-control nota-input" type="number" step="0.01" name="nota_actividades[{{ $alumno->dni }}]" max="3.0" oninput="calcularTotal(this)">
-                                        </td>
-                                        <td>
-                                            <input class="form-control nota-input" type="number" step="0.01" name="nota_practicas[{{ $alumno->dni }}]" max="3.0" oninput="calcularTotal(this)">
-                                        </td>
-                                        <td>
-                                            <input class="form-control nota-input" type="number" step="0.01" name="nota_autonomo[{{ $alumno->dni }}]" max="3.0" oninput="calcularTotal(this)">
-                                        </td>
-                                        <td>
-                                            <input class="form-control nota-input" type="number" step="0.01" name="examen_final[{{ $alumno->dni }}]" max="3.0" oninput="calcularTotal(this)">
-                                        </td>
-                                        <td>
-                                            <input class="form-control nota-input" type="number" step="0.01" name="recuperacion[{{ $alumno->dni }}]" max="3.0" oninput="calcularTotal(this)">
-                                        </td>
-                                        <td>
-                                            <input class="form-control total-input" type="number" step="0.01" name="total[{{ $alumno->dni }}]" readonly>
-                                        </td>
-                                    </tr>
-                                @endforeach
+                            @foreach ($alumnos as $alumno)
+                                @php
+                                    $nota = $notas->get($alumno->dni);
+                                @endphp
+                                <tr>
+                                    <td>{{ $alumno->nombre1 }} {{ $alumno->apellidop }}</td>
+                                    <input type="hidden" name="alumno_dni[]" value="{{ $alumno->dni }}">
+                                    <td>
+                                        <input class="form-control nota-input" type="number" step="0.01" name="nota_actividades[{{ $alumno->dni }}]" value="{{ $nota->nota_actividades ?? '' }}" max="3.0" oninput="calcularTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input class="form-control nota-input" type="number" step="0.01" name="nota_practicas[{{ $alumno->dni }}]" value="{{ $nota->nota_practicas ?? '' }}" max="3.0" oninput="calcularTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input class="form-control nota-input" type="number" step="0.01" name="nota_autonomo[{{ $alumno->dni }}]" value="{{ $nota->nota_autonomo ?? '' }}" max="3.0" oninput="calcularTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input class="form-control nota-input" type="number" step="0.01" name="examen_final[{{ $alumno->dni }}]" value="{{ $nota->examen_final ?? '' }}" max="3.0" oninput="calcularTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input class="form-control nota-input" type="number" step="0.01" name="recuperacion[{{ $alumno->dni }}]" value="{{ $nota->recuperacion ?? '' }}" max="3.0" oninput="calcularTotal(this)">
+                                    </td>
+                                    <td>
+                                        <input class="form-control total-input" type="number" step="0.01" name="total[{{ $alumno->dni }}]" value="{{ $nota->total ?? '' }}" readonly>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        
                             @endif
 
                             <!-- Generar filas adicionales para nuevos alumnos -->
@@ -105,11 +109,29 @@
             var notas = fila.querySelectorAll('.nota-input');
             var total = 0;
 
+            // Calcular el total
             notas.forEach(function(nota) {
                 total += parseFloat(nota.value) || 0;
             });
 
+            // Actualizar el valor del total
             fila.querySelector('.total-input').value = total.toFixed(2);
+
+            // Habilitar o deshabilitar el campo de recuperación
+            var campoRecuperacion = fila.querySelector('input[name^="recuperacion"]');
+            if (total < 7) {
+                campoRecuperacion.disabled = false;
+            } else {
+                campoRecuperacion.disabled = true;
+                campoRecuperacion.value = ''; // Limpiar el campo si se deshabilita
+            }
         }
+
+        // Llamar a calcularTotal en cada carga de la página para asegurar que los campos se actualicen correctamente
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nota-input').forEach(function(input) {
+                calcularTotal(input);
+            });
+        });
     </script>
 @stop
