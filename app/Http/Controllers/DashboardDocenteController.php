@@ -46,14 +46,12 @@ class DashboardDocenteController extends Controller
                         'cohorte_id' => $cohorte->id,
                     ])->exists();
         
-                    // Obtener la instancia de CalificacionVerificacion
                     $calificacionVerificacion = CalificacionVerificacion::where([
                         'docente_dni' => $docente->dni,
                         'asignatura_id' => $asignatura->id,
                         'cohorte_id' => $cohorte->id,
                     ])->first();
         
-                    // Obtener el valor de la propiedad 'editar' o establecerlo en false si no hay instancia
                     $editar = $calificacionVerificacion ? $calificacionVerificacion->editar : false;
         
                     $aulaId = $cohorte->aula ? $cohorte->aula->id : null;
@@ -89,7 +87,7 @@ class DashboardDocenteController extends Controller
                             'paralelo_id' => $paraleloId,
                             'notasExisten' => $notasExisten[$cohorte->id],
                         ]) : null,
-                        'alumnos' => $cohorte->matriculas->unique('alumno_dni')->map(function ($matricula) use ($docente, $asignatura, $cohorte) {
+                        'alumnos' => $cohorte->matriculas->where('asignatura_id', $asignatura->id)->unique('alumno_dni')->map(function ($matricula) use ($docente, $asignatura, $cohorte) {
                             // Obtener las notas del alumno
                             $notas = Nota::where([
                                 'alumno_dni' => $matricula->alumno->dni,
@@ -97,7 +95,7 @@ class DashboardDocenteController extends Controller
                                 'asignatura_id' => $asignatura->id,
                                 'cohorte_id' => $cohorte->id,
                             ])->first();
-        
+
                             return [
                                 'imagen' => asset($matricula->alumno->image),
                                 'nombreCompleto' => $matricula->alumno->apellidop . ' ' . $matricula->alumno->apellidom . ' ' . $matricula->alumno->nombre1 . ' ' . $matricula->alumno->nombre2,
@@ -114,9 +112,10 @@ class DashboardDocenteController extends Controller
                                     'examen_final' => $notas ? $notas->examen_final : 'N/A',
                                     'recuperacion' => $notas ? $notas->recuperacion : 'N/A',
                                     'total' => $notas ? $notas->total : 'N/A',
-                                ],
+                                ]
                             ];
                         }),
+
                     ];
                 }),
             ];

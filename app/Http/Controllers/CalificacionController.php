@@ -62,11 +62,12 @@ class CalificacionController extends Controller
             'nuevo_alumno.apellidop' => 'nullable|array',
             'nuevo_alumno.apellidom' => 'nullable|array',
         ]);
+
         $docenteDni = $request->input('docente_dni');
         $asignaturaId = $request->input('asignatura_id');
         $cohorteId = $request->input('cohorte_id');
         $cohorte = Cohorte::findOrFail($cohorteId);
-        $alumnoDnis = $request->input('alumno_dni');
+        $alumnoDnis = $request->input('alumno_dni', []);
         $notas = $request->only(['nota_actividades', 'nota_practicas', 'nota_autonomo', 'examen_final', 'recuperacion', 'total']);
         $nuevosAlumnos = $request->input('nuevo_alumno', []);
 
@@ -81,92 +82,94 @@ class CalificacionController extends Controller
             $calificacionVerificacion->editar = 0;
             $calificacionVerificacion->save();
         }
+
         try {
-                // Almacenar las calificaciones para los alumnos existentes
-                foreach ($alumnoDnis as $alumnoDni) {
-                    Nota::updateOrCreate(
-                        [
-                            'docente_dni' => $docenteDni,
-                            'alumno_dni' => $alumnoDni,
-                            'asignatura_id' => $asignaturaId,
-                            'cohorte_id' => $cohorteId,
-                        ],
-                        [
-                            'nota_actividades' => $notas['nota_actividades'][$alumnoDni] ?? null,
-                            'nota_practicas' => $notas['nota_practicas'][$alumnoDni] ?? null,
-                            'nota_autonomo' => $notas['nota_autonomo'][$alumnoDni] ?? null,
-                            'examen_final' => $notas['examen_final'][$alumnoDni] ?? null,
-                            'recuperacion' => $notas['recuperacion'][$alumnoDni] ?? null,
-                            'total' => $notas['total'][$alumnoDni] ?? null,
-                        ]
-                    );
-                }
-                // Verificar y crear nuevos alumnos si no existen
-                foreach ($nuevosAlumnos['dni'] as $index => $dni) {
-                    $nombre1 = $nuevosAlumnos['nombre1'][$index];
-                    $apellidop = $nuevosAlumnos['apellidop'][$index];
-                    $ultimo4Dni = substr($dni, -4);
-                    $email_institucional = strtolower($nombre1 . '-' . $apellidop . $ultimo4Dni) . '@unesum.edu.ec';
-                    $alumno = Alumno::firstOrCreate(
-                        ['dni' => $dni],
-                        [
-                            'nombre1' => $nombre1,
-                            'nombre2' => $nuevosAlumnos['nombre2'][$index] ?? null,
-                            'apellidop' => $apellidop,
-                            'apellidom' => $nuevosAlumnos['apellidom'][$index] ?? null,
-                            'email_institucional' => $email_institucional,
-                            'monto_total' => $cohorte->maestria->arancel,
-                            'maestria_id' => $cohorte->maestria->id,
-                        ]
-                    ); 
-                    $usuario = User::firstOrCreate(
-                        [
-                            'email' => $email_institucional,
-                        ],
-                        [
-                            'name' => $nombre1,
-                            'apellido' => $apellidop,
-                            'password' => bcrypt($dni),
-                            'status' => 'ACTIVO',
-                        ]
-                    );
-        
-                    if ($usuario->wasRecentlyCreated) {
-                        $alumnoRole = Role::findById(4);
-                        $usuario->assignRole($alumnoRole);
-                        Matricula::updateOrCreate(
-                            [
-                                'alumno_dni' => $dni,
-                                'asignatura_id' => $asignaturaId,
-                                'cohorte_id' => $cohorteId,
-                                'docente_dni' => $docenteDni,
-                            ]
-                        );
-                        $cohorte->aforo = $cohorte->aforo - 1;
-                        $cohorte->save();
-                    }
-        
-                    $usuario->save();
-        
-                    $nota = Nota::updateOrCreate([
+            foreach ($alumnoDnis as $alumnoDni) {
+                Nota::updateOrCreate(
+                    [
                         'docente_dni' => $docenteDni,
-                        'alumno_dni' => $alumno->dni,
+                        'alumno_dni' => $alumnoDni,
                         'asignatura_id' => $asignaturaId,
                         'cohorte_id' => $cohorteId,
-                        'nota_actividades' => $request->input("nuevo_nota_actividades.$index"),
-                        'nota_practicas' => $request->input("nuevo_nota_practicas.$index"),
-                        'nota_autonomo' => $request->input("nuevo_nota_autonomo.$index"),
-                        'examen_final' => $request->input("nuevo_examen_final.$index"),
-                        'recuperacion' => $request->input("nuevo_recuperacion.$index"),
-                        'total' => $request->input("nuevo_total.$index"),
-                    ]);
+                    ],
+                    [
+                        'nota_actividades' => $notas['nota_actividades'][$alumnoDni] ?? null,
+                        'nota_practicas' => $notas['nota_practicas'][$alumnoDni] ?? null,
+                        'nota_autonomo' => $notas['nota_autonomo'][$alumnoDni] ?? null,
+                        'examen_final' => $notas['examen_final'][$alumnoDni] ?? null,
+                        'recuperacion' => $notas['recuperacion'][$alumnoDni] ?? null,
+                        'total' => $notas['total'][$alumnoDni] ?? null,
+                    ]
+                );
+            }
+
+            foreach ($nuevosAlumnos['dni'] as $index => $dni) {
+                $nombre1 = $nuevosAlumnos['nombre1'][$index];
+                $apellidop = $nuevosAlumnos['apellidop'][$index];
+                $ultimo4Dni = substr($dni, -4);
+                $email_institucional = strtolower($nombre1 . '-' . $apellidop . $ultimo4Dni) . '@unesum.edu.ec';
+
+                $alumno = Alumno::firstOrCreate(
+                    ['dni' => $dni],
+                    [
+                        'nombre1' => $nombre1,
+                        'nombre2' => $nuevosAlumnos['nombre2'][$index] ?? null,
+                        'apellidop' => $apellidop,
+                        'apellidom' => $nuevosAlumnos['apellidom'][$index] ?? null,
+                        'email_institucional' => $email_institucional,
+                        'monto_total' => $cohorte->maestria->arancel,
+                        'maestria_id' => $cohorte->maestria->id,
+                    ]
+                );
+
+                $usuario = User::firstOrCreate(
+                    ['email' => $email_institucional],
+                    [
+                        'name' => $nombre1,
+                        'apellido' => $apellidop,
+                        'password' => bcrypt($dni),
+                        'status' => 'ACTIVO',
+                    ]
+                );
+
+                if ($usuario->wasRecentlyCreated) {
+                    $alumnoRole = Role::findById(4); 
+                    $usuario->assignRole($alumnoRole);
+                    Matricula::updateOrCreate(
+                        [
+                            'alumno_dni' => $dni,
+                            'asignatura_id' => $asignaturaId,
+                            'cohorte_id' => $cohorteId,
+                            'docente_dni' => $docenteDni,
+                        ]
+                    );
+                    $cohorte->aforo = $cohorte->aforo - 1;
+                    $cohorte->save();
                 }
-                return redirect()->route('dashboard_docente')->with('success', 'Calificaciones almacenadas exitosamente');
+
+                $usuario->save();
+
+                Nota::updateOrCreate([
+                    'docente_dni' => $docenteDni,
+                    'alumno_dni' => $dni,
+                    'asignatura_id' => $asignaturaId,
+                    'cohorte_id' => $cohorteId,
+                ], [
+                    'nota_actividades' => $request->input("nuevo_nota_actividades.$index"),
+                    'nota_practicas' => $request->input("nuevo_nota_practicas.$index"),
+                    'nota_autonomo' => $request->input("nuevo_nota_autonomo.$index"),
+                    'examen_final' => $request->input("nuevo_examen_final.$index"),
+                    'recuperacion' => $request->input("nuevo_recuperacion.$index"),
+                    'total' => $request->input("nuevo_total.$index"),
+                ]);
+            }
+
+            return redirect()->route('dashboard_docente')->with('success', 'Calificaciones almacenadas exitosamente');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error al intentar guardar las calificaciones: ' . $e->getMessage());
         }
-        
     }
+
 
     public function edit($alumno_dni, $docente_dni, $asignatura_id, $cohorte_id)
     {
